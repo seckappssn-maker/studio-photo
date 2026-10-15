@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Studio Photo</title>
+<meta name="description" content="Séances, clients, livraison des photos et réservations en ligne pour les photographes. Chaque client récupère ses photos avec son code.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://seckappssn-maker.github.io/studio-photo/">
+<meta property="og:title" content="Studio Photo">
+<meta property="og:description" content="Réservez votre séance photo et récupérez vos photos en ligne.">
+<meta property="og:image" content="https://seckappssn-maker.github.io/studio-photo/cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://seckappssn-maker.github.io/studio-photo/cover.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Studio Photo">
+<meta name="theme-color" content="#17120F">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<script>window.SP_ONLINE=true;</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" onerror="var s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';document.head.appendChild(s)"></script>
+<style>
+/* Layout: colonna unica da telefono, banda nero caldo con filo ambra in alto, barra schede in basso */
+:root{
+  --bg:#F3F0EC; --surface:#FFFFFF; --surface2:#F8F6F3; --ink:#1C1714; --muted:#6A5F58; --line:#E2DAD2;
+  --indigo:#8A2D3B; --indigo-ink:#FFFFFF; --band:#17120F; --band-ink:#F6EEE6;
+  --gold:#9A5B00; --gold-soft:#FBEBD0; --gold-line:#E8B04B;
+  --ok:#1D7348; --ok-soft:#DDF2E6; --warn:#A85A07; --warn-soft:#FBEBD5; --bad:#B42318; --bad-soft:#FBE1DE;
+  --chip:#EDE6DF; --shadow:0 1px 2px rgba(28,23,20,.06),0 4px 14px rgba(28,23,20,.07);
+  --f-display:"Bricolage Grotesque",system-ui,sans-serif; --f-body:"Figtree",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#110D0B; --surface:#1C1613; --surface2:#241D19; --ink:#F3ECE6; --muted:#B5A79D; --line:#3A2F29;
+  --indigo:#F08A97; --indigo-ink:#110D0B; --band:#0B0807; --band-ink:#F6EEE6;
+  --gold:#F2C46B; --gold-soft:#3A2A10; --gold-line:#E8B04B;
+  --ok:#5ACB92; --ok-soft:#163626; --warn:#F2A54A; --warn-soft:#3B2711; --bad:#F2786C; --bad-soft:#3D1A18;
+  --chip:#2B221D; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110D0B; --surface:#1C1613; --surface2:#241D19; --ink:#F3ECE6; --muted:#B5A79D; --line:#3A2F29;
+  --indigo:#F08A97; --indigo-ink:#110D0B; --band:#0B0807; --band-ink:#F6EEE6;
+  --gold:#F2C46B; --gold-soft:#3A2A10; --gold-line:#E8B04B;
+  --ok:#5ACB92; --ok-soft:#163626; --warn:#F2A54A; --warn-soft:#3B2711; --bad:#F2786C; --bad-soft:#3D1A18;
+  --chip:#2B221D; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold-line);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{background:var(--band);color:var(--band-ink);position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:12px 10px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{flex:none}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+.aname{font-family:var(--f-display);font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stitch{height:0;border-top:2px solid var(--gold-line);opacity:.9}
+.mode{display:flex;background:rgba(255,255,255,.1);border-radius:999px;padding:3px;flex:none}
+.mode button{border:0;background:none;color:var(--band-ink);padding:6px 11px;border-radius:999px;font-size:13px;font-weight:600}
+.mode button.on{background:var(--gold-line);color:#1B1606}
+main{padding-block:16px 24px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
+h1{font-size:24px;line-height:1.15}
+h2{font-size:18px}
+.sec{display:flex;flex-direction:column;gap:10px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border-radius:14px;padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat b{font-family:var(--f-display);font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat span{font-size:12px;color:var(--muted)}
+.fete{background:var(--gold-soft);border:1.5px dashed var(--gold-line);border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.fete b{font-family:var(--f-display);font-size:28px;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1}
+.list{display:flex;flex-direction:column;background:var(--surface);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.row{display:flex;gap:12px;align-items:center;padding:12px 14px;border:0;background:none;text-align:left;width:100%;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row:active{background:var(--surface2)}
+.row-main{flex:1;min-width:0}
+.row-t{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-s{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-end{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.thumb{width:48px;height:56px;border-radius:10px;object-fit:cover;flex:none;background:var(--chip)}
+.av{width:42px;height:42px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:700;color:var(--indigo);flex:none}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--muted);white-space:nowrap}
+.st-coupe,.st-couture,.st-finition{background:var(--warn-soft);color:var(--warn)}
+.st-pret{background:var(--ok-soft);color:var(--ok)}
+.st-recu{background:var(--chip);color:var(--indigo)}
+.st-livre{background:var(--chip);color:var(--muted)}
+.reste{font-size:12.5px;font-weight:700;color:var(--bad);font-variant-numeric:tabular-nums}
+.solde{font-size:12.5px;font-weight:700;color:var(--ok)}
+.bad{color:var(--bad)!important;font-weight:600}
+.empty{padding:22px 16px;text-align:center;color:var(--muted);font-size:14px}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;background:var(--indigo);color:var(--indigo-ink);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;min-height:46px}
+.btn.ghost{background:var(--chip);color:var(--ink)}
+.btn.gold{background:var(--gold-line);color:#1B1606}
+.btn.wa{background:#1FA855;color:#fff}
+.btn.danger{background:var(--bad-soft);color:var(--bad)}
+.btn.sm{padding:8px 12px;min-height:36px;font-size:13.5px;border-radius:10px}
+.btn.block{width:100%}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns>.btn{flex:1 1 140px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chip{border:0;background:var(--chip);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600;white-space:nowrap}
+.chip.on{background:var(--indigo);color:var(--indigo-ink)}
+.search{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 14px}
+.banner{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;display:flex;gap:10px;align-items:center;justify-content:space-between;font-size:13.5px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:20;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs .wrap{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+nav.tabs button{border:0;background:none;padding:9px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);position:relative}
+nav.tabs button.on{color:var(--indigo)}
+nav.tabs svg{width:23px;height:23px}
+.badge{position:absolute;top:4px;left:calc(50% + 6px);background:var(--bad);color:#fff;border-radius:999px;font-size:10.5px;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px}
+/* catalogue */
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.card{background:var(--surface);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);border:0;padding:0;text-align:left;display:flex;flex-direction:column}
+.card img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:var(--chip);max-width:100%}
+.card-b{padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px}
+.card-t{font-weight:700;font-size:14.5px;line-height:1.25}
+.price{font-family:var(--f-display);font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.tag{position:absolute;top:8px;left:8px;background:var(--gold-line);color:#1B1606;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px}
+.hbtn{border:1px solid rgba(255,255,255,.3);background:none;color:var(--band-ink);border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}
+.hchip{border:0;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;background:rgba(255,255,255,.14);color:var(--band-ink);white-space:nowrap}
+.hchip.ok{background:#1F7A4D;color:#fff}.hchip.warn{background:var(--gold-line);color:#1B1606}.hchip.bad{background:#C0392B;color:#fff}
+.sync{font-size:12px;opacity:.85;white-space:nowrap}.sync.err{color:#FFB4A9;opacity:1}
+.code{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.18em;color:var(--gold)}
+.linkbox{background:var(--surface2);border:1px dashed var(--gold-line);border-radius:10px;padding:10px 12px;font-size:13.5px;word-break:break-all;user-select:all}
+.imgw{position:relative}
+.pcount{position:absolute;bottom:8px;right:8px;background:rgba(10,12,30,.72);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px}
+.pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pcell{position:relative;aspect-ratio:4/5;max-width:100%}
+.pcell img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+.pcover{position:absolute;left:5px;bottom:5px;background:var(--gold-line);color:#1B1606;font-size:10px;font-weight:700;padding:2px 6px;border-radius:999px}
+.pdel,.pmove{position:absolute;top:5px;border:0;width:28px;height:28px;border-radius:50%;background:rgba(10,12,30,.72);color:#fff;font-size:16px;line-height:1;display:grid;place-items:center}
+.pdel{right:5px}.pmove{left:5px;font-size:13px}
+.padd{aspect-ratio:4/5;max-width:100%;border:2px dashed var(--line);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);cursor:pointer;text-align:center;padding:4px}
+.padd span{font-size:28px;line-height:1;color:var(--indigo)}
+.padd small{font-size:11.5px;font-weight:600}
+.gal{position:relative;border-radius:14px;overflow:hidden;background:var(--chip)}
+.gal-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.gal-track::-webkit-scrollbar{display:none}
+.gal-track img{flex:0 0 100%;width:100%;max-height:380px;object-fit:contain;scroll-snap-align:center}
+.gal-n{position:absolute;top:10px;right:10px;background:rgba(10,12,30,.72);color:#fff;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px}
+.dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px}
+.dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+.dots i.on{background:#fff;width:18px;border-radius:9px}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(4,12,18,.55);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:640px;max-height:92%;overflow-y:auto;border-radius:20px 20px 0 0;padding-block:8px calc(20px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px;overscroll-behavior:contain}
+.grab{width:40px;height:4px;border-radius:9px;background:var(--line);margin:4px auto 0}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.x{border:0;background:var(--chip);width:34px;height:34px;border-radius:50%;font-size:18px;line-height:1;flex:none}
+.panel{background:var(--surface);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+.f label{font-size:12.5px;font-weight:600;color:var(--muted)}
+.f input,.f select,.f textarea{border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:10px 12px;width:100%;min-width:0;font-size:16px}
+.f textarea{min-height:76px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mes{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.mes .f input{text-align:right;font-variant-numeric:tabular-nums}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:14px}
+.kv div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--line);padding-bottom:4px}
+.kv b{font-variant-numeric:tabular-nums}
+.money{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:6px}
+.money b{display:block;font-family:var(--f-display);font-size:17px;font-variant-numeric:tabular-nums}
+.money span{font-size:12px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.step{border:0;background:var(--chip);border-radius:9px;padding:8px 2px;font-size:11px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px}
+.step i{width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.5}
+.step.done{background:var(--indigo);color:var(--indigo-ink)}
+.step.done i{opacity:1}
+.bar{height:8px;border-radius:9px;background:var(--chip);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold-line);border-radius:9px}
+.photo-big{width:100%;max-height:360px;object-fit:contain;border-radius:14px;background:var(--chip)}
+.photo-pick{display:flex;gap:12px;align-items:center}
+.photo-pick img{width:64px;height:76px;object-fit:cover;border-radius:10px}
+.msg{background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow)}
+.reply{background:var(--gold-soft);border-radius:10px;padding:8px 11px;font-size:14px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.act{border:0;background:var(--surface);border-radius:16px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow);min-height:96px}
+.act svg{width:26px;height:26px;color:var(--gold)}
+.act b{font-size:14.5px}
+.act span{font-size:12.5px;color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;z-index:60;font-size:14px;max-width:90%}
+.note{font-size:12.5px;color:var(--muted)}
+.hello{display:flex;flex-direction:column;gap:4px}
+@media (min-width:560px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(30px);opacity:.6}}}
+</style>
+<style>
+.timeline{display:flex;flex-direction:column;gap:8px}
+.ses{border:0;background:var(--surface);border-radius:14px;padding:11px 13px;text-align:left;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow);border-left:4px solid var(--line);width:100%;min-width:0}
+.ses.prevu{border-left-color:var(--indigo)}.ses.fait{border-left-color:var(--warn)}.ses.livre{border-left-color:var(--ok)}.ses.annule{opacity:.6}
+.st-prevu{background:var(--chip);color:var(--indigo)}.st-fait{background:var(--warn-soft);color:var(--warn)}.st-livre{background:var(--ok-soft);color:var(--ok)}.st-annule{background:var(--chip);color:var(--muted)}
+.dbox{width:50px;flex:none;text-align:center;border-radius:10px;background:var(--surface2);padding:6px 2px;line-height:1.1}
+.dbox b{display:block;font-family:var(--f-display);font-size:20px}.dbox small{font-size:11px;text-transform:uppercase;color:var(--muted);font-weight:700}
+.big-total{font-family:var(--f-display);font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.navd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mode-b{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 4px;font-weight:700;font-size:13.5px}
+.mode-b.on{border-color:var(--indigo);background:var(--indigo);color:var(--indigo-ink)}
+.seg{display:flex;background:var(--chip);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:none;border-radius:10px;padding:8px;font-weight:700;font-size:14px;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+@media (min-width:520px){.pg{grid-template-columns:repeat(4,1fr)}}
+.pt{position:relative;border:0;padding:0;background:var(--chip);aspect-ratio:1;border-radius:8px;overflow:hidden;display:block;width:100%}
+.pt img{width:100%;height:100%;object-fit:cover;display:block}
+.pt .ck{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.25)}
+.pt.sel .ck{background:var(--indigo);box-shadow:inset 0 0 0 3px #fff}
+.pt.sel img{opacity:.75}
+.pt .pub{position:absolute;left:5px;bottom:5px;background:var(--gold-line);color:#1B1606;font-size:10px;font-weight:800;padding:2px 6px;border-radius:999px}
+.meter{height:10px;border-radius:999px;background:var(--chip);overflow:hidden}.meter i{display:block;height:100%;background:var(--indigo);border-radius:999px}
+.meter.warn i{background:var(--warn)}.meter.bad i{background:var(--bad)}
+.ann{border-radius:18px;overflow:hidden;background:var(--band);color:var(--band-ink);box-shadow:var(--shadow);display:flex;flex-direction:column}
+.ann img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.ann .ab{padding:14px 15px 15px;display:flex;flex-direction:column;gap:8px}
+.ann h2{font-family:var(--f-display);font-size:22px;line-height:1.1;margin:0}
+.ann .cd{display:inline-flex;align-self:flex-start;background:var(--gold-line);color:#1B1606;font-weight:800;font-size:13px;padding:4px 10px;border-radius:999px}
+.ann .sm2{font-size:13.5px;opacity:.85}
+.ann .places{font-weight:700;font-size:14px}
+.lb{position:fixed;inset:0;background:#000;z-index:80;display:flex;flex-direction:column}
+.lb-top{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;color:#fff;gap:8px}
+.lb-top button,.lb-nav button{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:999px;padding:9px 14px;font-weight:700}
+.lb-img{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.lb-img img{max-width:100%;max-height:100%;object-fit:contain}
+.lb-nav{display:flex;justify-content:space-between;padding:10px 12px calc(14px + env(safe-area-inset-bottom,0px))}
+.prog{height:8px;border-radius:999px;background:var(--chip);overflow:hidden}.prog i{display:block;height:100%;background:var(--gold-line);transition:width .2s}
+.lots{display:flex;flex-direction:column;gap:8px}
+.cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}
+.cats button{flex:none}
+.stat b{font-size:clamp(14px,4.3vw,20px);letter-spacing:-.01em}
+.sec-h>div{min-width:0}.panel .sec-h .pill{max-width:46%;white-space:normal;text-align:center;flex:none}
+[hidden]{display:none!important}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#E8B04B"/><path d="M8 13.5a2 2 0 0 1 2-2h2.6l1.6-2.5h5.6l1.6 2.5H24a2 2 0 0 1 2 2V23a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2z" fill="none" stroke="#17120F" stroke-width="2.2" stroke-linejoin="round"/><circle cx="17" cy="18" r="3.6" fill="none" stroke="#17120F" stroke-width="2.2"/></svg>
+      <div style="min-width:0"><div class="eyebrow">Studio Photo</div><div class="aname" id="aname"></div></div>
+    </div>
+    <div id="hdrR"></div>
+  </div>
+  <div class="stitch"></div>
+</header>
+<main class="wrap" id="main"></main>
+<nav class="tabs"><div class="wrap" id="tabs"></div></nav>
+<div id="sheetRoot"></div>
+<div id="lbRoot"></div>
+<div id="toastRoot"></div>
+
+<script>
+(function(){
+const KEY='studio-photo-demo-v1';
+const EVENTS=['Mariage','Baptême','Magal','Tabaski','Korité','Gamou','Anniversaire','Portrait / studio','Shooting mode','Cérémonie','Autre'];
+const MODES=['Espèces','Wave','Orange Money'];
+const SS={prevu:'Prévue',fait:'Faite',livre:'Photos livrées',annule:'Annulée'};
+const SSTEPS=['prevu','fait','livre'];
+const FORM={essentiel:{nom:'Essentiel',prix:5000,max:500},pro:{nom:'Pro',prix:10000,max:2000},premium:{nom:'Premium',prix:15000,max:5000}};
+const KEEP=30;
+let S, FILES=[], view='accueil', mode='studio', q='', viewAs=null, delArm=null, caDay=null, agF='avenir', selMode=false, SEL=new Set(), vitCat='', cCat='', upBusy=false;
+
+/* ---------- utils ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10);
+const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const today=()=>iso(new Date());
+const addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+const shift=(s,n)=>{const d=new Date(s+'T12:00');d.setDate(d.getDate()+n);return iso(d)};
+const daysTo=s=>Math.round((new Date(s+'T12:00')-new Date(today()+'T12:00'))/864e5);
+const dateFr=(s,opt)=>s?new Date(s+'T12:00').toLocaleDateString('fr-FR',opt||{weekday:'short',day:'numeric',month:'short'}):'';
+const dayLabel=s=>{const d=daysTo(s);return d===0?'Aujourd’hui':d===1?'Demain':d===-1?'Hier':dateFr(s,{weekday:'long',day:'numeric',month:'long'})};
+const fmt=n=>Math.round(+n||0).toLocaleString('fr-FR').replace(/[  ]/g,' ')+' F';
+const num=v=>{const n=parseFloat(String(v).replace(/\s/g,'').replace(',','.'));return isNaN(n)?0:n};
+const initials=s=>String(s||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const client=id=>S.clients.find(c=>c.id===id);
+const ses_=id=>S.seances.find(x=>x.id===id);
+const ann_=id=>(S.annonces||[]).find(a=>a.id===id);
+const waNum=t=>{let d=String(t||'').replace(/\D/g,'');if(d.startsWith('00'))d=d.slice(2);if(d.length===9)d='221'+d;return d};
+const waLink=(t,msg)=>'https://wa.me/'+waNum(t)+'?text='+encodeURIComponent(msg);
+const val=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
+const nowHm=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+const sumP=a=>(a||[]).reduce((x,p)=>x+num(p.montant),0);
+const reste=s=>Math.max(0,num(s.prix)-sumP(s.paiements));
+const cNom=id=>(client(id)||{}).nom||'Client';
+const filesOf=sid=>FILES.filter(f=>f.seanceId===sid);
+const filesClient=cid=>FILES.filter(f=>f.clientId===cid);
+const quota=()=>{const f=(typeof LIC!=='undefined'&&LIC&&LIC.formule&&FORM[LIC.formule])?LIC.formule:'pro';return FORM[f]};
+const plural=(n,a,b)=>n+' '+(n>1?b:a);
+
+/* art for sample photos */
+function art(h1,h2,kind,w,hh){w=w||600;hh=hh||750;const sky=`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${h1}"/><stop offset="1" stop-color="${h2}"/></linearGradient></defs><rect width="${w}" height="${hh}" fill="url(#g)"/>`;
+  const p=(x,s,c)=>`<g transform="translate(${x} ${hh*0.42}) scale(${s})"><circle cx="0" cy="0" r="38" fill="${c}"/><path d="M-70 260c0-90 30-180 70-180s70 90 70 180z" fill="${c}"/></g>`;
+  let body='';if(kind==='couple')body=p(w*0.4,1.25,'#2a1c16')+p(w*0.62,1.15,'#3b2318');else if(kind==='group')body=p(w*0.2,.9,'#2a1c16')+p(w*0.4,1,'#33241c')+p(w*0.6,1.05,'#22160f')+p(w*0.8,.95,'#3b2318');else if(kind==='mosque')body=`<path d="M0 ${hh*0.7}h${w}v${hh}H0z" fill="#2a1c16"/><path d="M${w*0.3} ${hh*0.7}v-140a${w*0.2} ${w*0.2} 0 0 1 ${w*0.4} 0v140z" fill="#33241c"/><rect x="${w*0.78}" y="${hh*0.25}" width="26" height="${hh*0.45}" fill="#33241c"/>`;else body=p(w*0.5,1.5,'#2a1c16');
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${hh}">${sky}<circle cx="${w*0.78}" cy="${hh*0.18}" r="${w*0.12}" fill="#fff" opacity=".35"/>${body}</svg>`;
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)}
+
+/* ---------- données d'exemple ---------- */
+function seed(){
+  const C=(nom,tel,aut)=>({id:uid(),nom,tel,note:'',code:String(1000+Math.floor(Math.random()*9000)),autorise:!!aut});
+  const c1=C('Fatou & Ibrahima','77 512 08 44',true),c2=C('Famille Diop','78 210 66 31'),c3=C('Aminata Sow','76 904 22 17',true),c4=C('Cheikh Mbacké','77 318 90 05');
+  const P=(m,mo)=>({id:uid(),montant:m,mode:mo,date:addDays(-3),heure:'12:00'});
+  const s1={id:uid(),clientId:c1.id,event:'Mariage',date:addDays(-6),heure:'15:00',lieu:'Mairie de Mermoz',prix:150000,paiements:[P(100000,'Wave'),P(50000,'Espèces')],statut:'livre',dateLivre:addDays(-2),note:''};
+  const s2={id:uid(),clientId:c2.id,event:'Baptême',date:addDays(-2),heure:'10:00',lieu:'Parcelles U17',prix:50000,paiements:[P(20000,'Orange Money')],statut:'fait',note:''};
+  const s3={id:uid(),clientId:c3.id,event:'Portrait / studio',date:addDays(1),heure:'17:30',lieu:'Studio',prix:15000,paiements:[],statut:'prevu',note:'Tenue traditionnelle'};
+  const s4={id:uid(),clientId:c4.id,event:'Magal',date:addDays(12),heure:'09:00',lieu:'Touba, Grande Mosquée',prix:25000,paiements:[P(10000,'Wave')],statut:'prevu',note:'',annonceId:'A1'};
+  const F=(s,i,a,b,k,pub)=>({id:uid(),clientId:s?s.clientId:null,seanceId:s?s.id:null,url:art(a,b,k),thumb:art(a,b,k),size:0,cat:s?s.event:'Mariage',public:!!pub,expire:s?shift(s.dateLivre||today(),KEEP):null,created:today()});
+  const files=[F(s1,1,'#F2C46B','#B4533A','couple',true),F(s1,2,'#F7D9A8','#8A2D3B','couple'),F(s1,3,'#E8B04B','#5E2A1F','group',true),F(s1,4,'#F9E6C8','#A0522D','single'),F(s1,5,'#F2C46B','#7A3B2E','group'),F(s1,6,'#FDE7C2','#8A2D3B','couple'),
+    F(s2,1,'#CFE8F2','#3E6E8A','group'),F(s2,2,'#E0F0F5','#2F5D75','single'),F(s2,3,'#D6ECF4','#41708A','group'),
+    F(null,1,'#BFD8C5','#1F5E46','mosque',true),F(null,2,'#F4D3B5','#9B3D2B','single',true)];
+  files[9].cat='Magal';files[10].cat='Portrait / studio';
+  const dem=[
+    {id:uid(),clientId:null,nomV:'Moussa Ndiaye',telV:'70 213 55 09',type:'resa',texte:'Nous serons 6 personnes.',data:{event:'Magal',date:addDays(12),heure:'',lieu:'Touba',annonceId:'A1'},date:today(),statut:'nouveau',reponse:''},
+    {id:uid(),clientId:null,nomV:'Ndèye Fall',telV:'77 621 40 18',type:'resa',texte:'Mariage civil + soirée',data:{event:'Mariage',date:addDays(25),heure:'16:00',lieu:'Saly'},date:today(),statut:'nouveau',reponse:''},
+    {id:uid(),clientId:c2.id,type:'question',texte:'Vous faites aussi les vidéos ?',date:addDays(-1),statut:'nouveau',reponse:''},
+  ];
+  const annonces=[{id:'A1',titre:'Magal de Touba : réservez votre séance photo',event:'Magal',date:addDays(12),limite:addDays(10),prix:25000,places:30,texte:'Photos de famille devant la Grande Mosquée, livrées sur votre téléphone en 48 h. Les places partent vite : réservez maintenant !',photo:art('#BFD8C5','#1F5E46','mosque',800,450),actif:true}];
+  const services=[{id:uid(),nom:'Mariage (journée)',prix:150000,desc:'Mairie, cérémonie et soirée. 300 photos retouchées.'},{id:uid(),nom:'Baptême',prix:50000,desc:'Toute la cérémonie, 150 photos.'},{id:uid(),nom:'Séance studio',prix:15000,desc:'30 min, 20 photos retouchées.'},{id:uid(),nom:'Événement religieux',prix:25000,desc:'Magal, Gamou, Tabaski, Korité : photos de famille.'}];
+  return {v:1,demo:true,shop:{nom:'Sanzo Picture',tel:'77 411 48 71',ville:'Dakar',adresse:'Liberté 6',insta:'sanzo__picture',tiktok:'sanzopicture1',apropos:'Photographe mariages, baptêmes et événements. Photos livrées sur votre téléphone.',bloquer:true},
+    services,annonces,clients:[c1,c2,c3,c4],seances:[s1,s2,s3,s4],demandes:dem,files};
+}
+function fixState(o){if(!o)return o;['clients','seances','services','annonces'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[]});if(!Array.isArray(o.demandes))o.demandes=[];
+  o.shop=o.shop||{nom:'Mon studio',tel:'',ville:'',adresse:'',insta:'',tiktok:'',apropos:'',bloquer:false};
+  o.clients.forEach(c=>{if(!c.code)c.code=newCode()});o.seances.forEach(s=>{if(!Array.isArray(s.paiements))s.paiements=[]});return o}
+function load(){try{const r=localStorage.getItem(KEY);if(r){S=fixState(JSON.parse(r))}}catch(e){}if(!S)S=fixState(seed());if(!Array.isArray(S.files))S.files=[];FILES=S.files}
+function save(){if(ONLINE)return saveOnline();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Mémoire de la démo pleine : supprimez quelques photos')}}
+
+/* ---------- photos : compression ---------- */
+function loadImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const i=new Image();i.onload=()=>{res(i)};i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};i.src=u})}
+function toBlob(img,max,qual){const r=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const cv=document.createElement('canvas');cv.width=Math.round(img.naturalWidth*r);cv.height=Math.round(img.naturalHeight*r);
+  const cx=cv.getContext('2d');cx.drawImage(img,0,0,cv.width,cv.height);return new Promise(res=>cv.toBlob(b=>res(b),'image/jpeg',qual))}
+const blobToData=b=>new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(b)});
+async function prepPhoto(file){const img=await loadImg(file);
+  let full=await toBlob(img,ONLINE?1920:900,ONLINE?.8:.7);if(full&&full.size>1900000)full=await toBlob(img,1600,.7);
+  const thumb=await toBlob(img,ONLINE?480:300,.65);URL.revokeObjectURL(img.src);return {full,thumb}}
+/* upload a batch: opts {clientId, seanceId, pub, cat} */
+async function addPhotos(list,opts,onp){list=[...list].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|heic|webp)$/i.test(f.name));
+  if(!list.length){toast('Choisissez des photos');return 0}
+  const room=ONLINE?quota().max-FILES.length:Math.max(0,40-FILES.length);
+  if(room<=0){toast(ONLINE?'Limite de votre formule atteinte : supprimez des photos ou passez à une formule plus grande':'Démo : 40 photos maximum');return 0}
+  if(list.length>room){toast('Seulement '+room+' photos de plus possibles');list=list.slice(0,room)}
+  let done=0,fail=0;upBusy=true;
+  for(const f of list){try{const p=await prepPhoto(f);
+      const rec={clientId:opts.clientId||null,seanceId:opts.seanceId||null,cat:opts.cat||'',public:!!opts.pub,expire:opts.pub?null:addDays(KEEP),created:today(),size:(p.full?p.full.size:0)+(p.thumb?p.thumb.size:0)};
+      if(ONLINE){const r=await fileUpload(p,rec);if(!r)throw new Error('up');FILES.unshift(r)}
+      else{rec.id=uid();rec.url=await blobToData(p.full);rec.thumb=await blobToData(p.thumb);FILES.unshift(rec)}
+      done++}catch(e){fail++}
+    onp&&onp(done+fail,list.length)}
+  upBusy=false;if(!ONLINE)save();
+  if(fail)toast(fail+' photo(s) pas envoyée(s) : vérifiez internet');return done}
+async function filesPatch(ids,patch){ids=[...ids];FILES.forEach(f=>{if(ids.includes(f.id))Object.assign(f,patch)});if(ONLINE)await fileUpdate(ids,patch);else save()}
+async function filesRemove(ids){ids=[...ids];const rm=FILES.filter(f=>ids.includes(f.id));FILES=FILES.filter(f=>!ids.includes(f.id));if(ONLINE)await fileDelete(rm);else{S.files=FILES;save()}}
+function cleanupExpired(){const old=FILES.filter(f=>!f.public&&f.expire&&f.expire<today());if(old.length)filesRemove(old.map(f=>f.id))}
+
+/* ---------- save photos on the phone (client) ---------- */
+let PREP=null;
+async function fetchFiles(list,onp){const out=[];let k=0;for(const f of list){try{const r=await fetch(f.url);const b=await r.blob();out.push(new File([b],'photo-'+(++k)+'.jpg',{type:b.type||'image/jpeg'}))}catch(e){}onp&&onp(out.length,list.length)}return out}
+async function shareOrDownload(files){
+  try{if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files});return true}}catch(e){if(e&&e.name==='AbortError')return false}
+  for(const f of files){const u=URL.createObjectURL(f);const a=document.createElement('a');a.href=u;a.download=f.name;document.body.appendChild(a);a.click();a.remove();await new Promise(r=>setTimeout(r,350));setTimeout(()=>URL.revokeObjectURL(u),4000)}return true}
+
+/* ---------- toast, sheet, lightbox ---------- */
+let tt;function toast(m){$('#toastRoot').innerHTML=`<div class="toast" role="status">${esc(m)}</div>`;clearTimeout(tt);tt=setTimeout(()=>$('#toastRoot').innerHTML='',2600)}
+function sheet(title,body){$('#sheetRoot').innerHTML=`<div class="scrim" data-act="close-bg"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="grab"></div><div class="sheet-h"><h2>${esc(title)}</h2><button class="x" data-act="close" aria-label="Fermer">×</button></div>${body}</div></div>`;document.body.style.overflow='hidden';delArm=null}
+function closeSheet(){if(upBusy)return toast('Envoi en cours : attendez la fin');$('#sheetRoot').innerHTML='';document.body.style.overflow='';PREP=null}
+let LB=null;
+function lightbox(list,i,canSave){LB={list,i,canSave};drawLB()}
+function drawLB(){if(!LB){$('#lbRoot').innerHTML='';return}const f=LB.list[LB.i];
+  $('#lbRoot').innerHTML=`<div class="lb" role="dialog" aria-modal="true" aria-label="Photo"><div class="lb-top"><button data-act="lb-close">× Fermer</button><span>${LB.i+1} / ${LB.list.length}</span>${LB.canSave?'<button data-act="lb-save">Enregistrer</button>':'<span></span>'}</div><div class="lb-img"><img src="${f.url}" alt="Photo ${LB.i+1}"></div><div class="lb-nav"><button data-act="lb-prev" ${LB.i?'':'disabled style="opacity:.3"'}>‹ Avant</button><button data-act="lb-next" ${LB.i<LB.list.length-1?'':'disabled style="opacity:.3"'}>Après ›</button></div></div>`}
+
+/* ---------- icônes ---------- */
+const I={
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.8 3 2.6 3.5 5.2"/></svg>',
+  img:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>',
+  cash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>',
+  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+  cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5a2 2 0 0 1 2-2h2.5L9 4h6l1.5 2.5H19a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  mega:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4a1 1 0 0 0 1 1h3l6 4V5L7 9H4a1 1 0 0 0-1 1z"/><path d="M17 8.5a5 5 0 0 1 0 7M19.5 6a8.5 8.5 0 0 1 0 12"/></svg>',
+  q:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/></svg>',
+  wa:'<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.8-1c.2-.3.4-.2.6-.1l2 .9c.3.1.4.2.5.3 0 .2 0 .8-.2 1.4z"/></svg>'
+};
+
+/* ---------- rendu ---------- */
+function render(){
+  if(ONLINE&&onlineScreen())return;
+  $('#aname').textContent=S.shop.nom;renderHdr();
+  const nNew=S.demandes.filter(d=>d.statut==='nouveau').length;
+  const tabs=mode==='studio'
+    ?[['accueil','Accueil',I.home,nNew],['agenda','Séances',I.cal],['clients','Clients',I.users],['vitrine','Vitrine',I.img],['caisse','Caisse',I.cash]]
+    :[['c-studio','Le studio',I.img],['c-direct','Réserver',I.cal],['c-accueil','Mes photos',I.cam],['c-messages','Messages',I.msg]];
+  $('#tabs').innerHTML=tabs.map(([k,l,ic,b])=>`<button class="${view===k?'on':''}" data-act="tab" data-v="${k}" aria-label="${l}">${ic}<span>${l}</span>${b?`<span class="badge">${b}</span>`:''}</button>`).join('');
+  const V={accueil,agenda,clients,vitrine,caisse,demandes,annonces:annoncesView,'c-studio':cStudio,'c-direct':cDirect,'c-accueil':cAccueil,'c-messages':cMessages};
+  $('#main').innerHTML=(V[view]||accueil)();
+}
+const demoBanner=()=>S.demo?`<div class="banner"><span>Ce sont des <b>exemples</b> pour découvrir l'app.</span><button class="btn sm ghost" data-act="clear-demo">Commencer à vide</button></div>`:'';
+function sesRow(s,showClient=true){const d=new Date(s.date+'T12:00');const n=filesOf(s.id).length;const r=reste(s);
+  return `<button class="ses ${s.statut}" data-act="ses" data-id="${s.id}"><div class="dbox"><b>${d.getDate()}</b><small>${d.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')}</small></div><div class="row-main"><div class="row-t">${esc(showClient?cNom(s.clientId):s.event)}</div><div class="row-s">${esc(s.event)}${s.heure?' · '+esc(s.heure):''}${s.lieu?' · '+esc(s.lieu):''}</div><div class="row-s">${n?plural(n,'photo','photos'):'Pas encore de photos'}</div></div><div class="row-end"><span class="pill st-${s.statut}">${SS[s.statut]}</span>${num(s.prix)?(r?`<span class="reste">${fmt(r)}</span>`:'<span class="solde">Payé</span>'):''}</div></button>`}
+function meterHtml(){const n=FILES.length,Q=quota();const pc=Math.min(100,Math.round(n/Q.max*100));
+  return `<div class="panel"><div class="sec-h"><span class="lbl">Photos en ligne</span><b style="font-variant-numeric:tabular-nums">${n} / ${Q.max}</b></div><div class="meter ${pc>=95?'bad':pc>=80?'warn':''}"><i style="width:${pc}%"></i></div><div class="small muted">${ONLINE?'Formule '+Q.nom+' · ':''}Les photos des clients s’effacent seules ${KEEP} jours après l’envoi. La vitrine reste.</div></div>`}
+function accueil(){
+  const up=S.seances.filter(s=>s.statut==='prevu'&&daysTo(s.date)>=0).sort((a,b)=>(a.date+a.heure).localeCompare(b.date+b.heure));
+  const aLivrer=S.seances.filter(s=>s.statut==='fait');
+  const mo=today().slice(0,7);const encMo=allPays().filter(p=>String(p.date).slice(0,7)===mo).reduce((a,p)=>a+num(p.montant),0);
+  const news=S.demandes.filter(d=>d.statut==='nouveau');
+  const exp=S.clients.map(c=>{const fs=filesClient(c.id).filter(f=>!f.public&&f.expire);if(!fs.length)return null;const e=fs.map(f=>f.expire).sort()[0];return daysTo(e)<=5?{c,e,n:fs.length}:null}).filter(Boolean);
+  const anns=(S.annonces||[]).filter(a=>a.actif&&daysTo(a.date)>=0);
+  return `${demoBanner()}${typeof a2hs==='function'?a2hs():''}
+  <div class="sec-h"><h1>${new Date().getHours()<17?'Bonjour':'Bonsoir'}, ${esc(S.shop.nom)}</h1><button class="btn sm ghost" data-act="settings">Réglages</button></div>
+  <div class="stats"><div class="stat"><b>${up.length}</b><span>Séances à venir</span></div><div class="stat"><b>${aLivrer.length}</b><span>Photos à livrer</span></div><div class="stat"><b>${fmt(encMo)}</b><span>Encaissé ce mois</span></div></div>
+  <div class="btns"><button class="btn" data-act="new-ses">+ Séance</button><button class="btn gold" data-act="up-pick">Envoyer des photos</button></div>
+  ${news.length?`<section class="sec"><div class="sec-h"><h2>À traiter</h2><button class="btn sm ghost" data-act="tab" data-v="demandes">Tout voir</button></div><div class="list">${news.slice(0,4).map(demRow).join('')}</div></section>`:''}
+  ${anns.map(a=>{const n=annCount(a.id);return `<button class="panel" style="text-align:left;border:0" data-act="ann" data-id="${a.id}"><div class="sec-h"><span class="lbl">${I.mega.replace('<svg','<svg width="16" height="16" style="vertical-align:-3px"')} Annonce en cours</span><span class="pill">${daysTo(a.date)===0?'Aujourd’hui':'J-'+daysTo(a.date)}</span></div><b>${esc(a.titre)}</b><div class="small muted">${plural(n,'réservation','réservations')}${num(a.places)?' · '+Math.max(0,num(a.places)-n)+' places restantes':''}</div></button>`}).join('')}
+  ${aLivrer.length?`<section class="sec"><div class="sec-h"><h2>Photos à livrer</h2></div><div class="timeline">${aLivrer.map(s=>sesRow(s)).join('')}</div></section>`:''}
+  <section class="sec"><div class="sec-h"><h2>Prochaines séances</h2><button class="btn sm ghost" data-act="tab" data-v="agenda">Tout voir</button></div><div class="timeline">${up.length?up.slice(0,5).map(s=>sesRow(s)).join(''):'<div class="list"><div class="empty">Aucune séance prévue.</div></div>'}</div></section>
+  ${exp.length?`<div class="banner"><span>Photos bientôt effacées : <b>${exp.map(x=>esc(x.c.nom)+' ('+dateFr(x.e,{day:'numeric',month:'short'})+')').join(', ')}</b>. Rappelez-leur de les enregistrer, ou prolongez.</span></div>`:''}
+  ${meterHtml()}`;
+}
+function agenda(){
+  const F={avenir:s=>s.statut==='prevu',alivrer:s=>s.statut==='fait',livre:s=>s.statut==='livre',tous:()=>true};
+  const L={avenir:'À venir',alivrer:'À livrer',livre:'Livrées',tous:'Toutes'};
+  let list=S.seances.filter(F[agF]);if(q)list=list.filter(s=>(cNom(s.clientId)+' '+s.event+' '+s.lieu).toLowerCase().includes(q.toLowerCase()));
+  list.sort((a,b)=>agF==='avenir'?(a.date+a.heure).localeCompare(b.date+b.heure):(b.date+b.heure).localeCompare(a.date+a.heure));
+  return `<div class="sec-h"><h1>Séances</h1><button class="btn sm" data-act="new-ses">+ Nouvelle</button></div>
+  <input class="search" id="q" type="search" placeholder="Client, événement, lieu…" value="${esc(q)}" data-input="q">
+  <div class="chips">${Object.keys(L).map(k=>`<button class="chip ${agF===k?'on':''}" data-act="ag-f" data-v="${k}">${L[k]} · ${S.seances.filter(F[k]).length}</button>`).join('')}</div>
+  <div class="timeline">${list.length?list.map(s=>sesRow(s)).join(''):'<div class="list"><div class="empty">Aucune séance ici.</div></div>'}</div>
+  <button class="btn ghost block" data-act="tab" data-v="annonces">${I.mega.replace('<svg','<svg width="18" height="18"')} Annonces d’événements (Magal, Tabaski…)</button>`;
+}
+function clients(){
+  let list=[...S.clients].sort((a,b)=>a.nom.localeCompare(b.nom));
+  if(q)list=list.filter(c=>(c.nom+' '+c.tel).toLowerCase().includes(q.toLowerCase()));
+  return `<div class="sec-h"><h1>Clients</h1><button class="btn sm" data-act="new-client">+ Nouveau</button></div>
+  <input class="search" id="q" type="search" placeholder="Nom ou téléphone…" value="${esc(q)}" data-input="q">
+  <div class="list">${list.length?list.map(c=>{const n=filesClient(c.id).length,ns=S.seances.filter(s=>s.clientId===c.id).length,du=S.seances.filter(s=>s.clientId===c.id&&s.statut!=='annule').reduce((a,s)=>a+reste(s),0);
+    return `<button class="row" data-act="client" data-id="${c.id}"><div class="av">${initials(c.nom)}</div><div class="row-main"><div class="row-t">${esc(c.nom)}</div><div class="row-s">${esc(c.tel)}</div><div class="row-s">${plural(ns,'séance','séances')} · ${plural(n,'photo','photos')}${c.autorise?' · ✓ publication':''}</div></div><div class="row-end">${du?`<span class="reste">${fmt(du)}</span>`:''}</div></button>`}).join(''):'<div class="empty">Aucun client.</div>'}</div>`;
+}
+function vitrine(){
+  const pub=FILES.filter(f=>f.public);const cats=[...new Set(pub.map(f=>f.cat).filter(Boolean))];const list=vitCat?pub.filter(f=>f.cat===vitCat):pub;
+  return `<div class="sec-h"><h1>Vitrine</h1><button class="btn sm" data-act="vit-add">+ Photos</button></div>
+  <p class="note" style="margin:0">Vos plus belles photos, sur votre page. Celles de vos clients seulement s’ils ont dit oui.</p>
+  ${cats.length>1?`<div class="cats"><button class="chip ${vitCat?'':'on'}" data-act="vit-cat" data-v="">Toutes</button>${cats.map(c=>`<button class="chip ${vitCat===c?'on':''}" data-act="vit-cat" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>`:''}
+  ${list.length?`<div class="pg">${list.map((f,i)=>`<button class="pt" data-act="vit-photo" data-id="${f.id}"><img src="${f.thumb||f.url}" alt="" loading="lazy"></button>`).join('')}</div>`:'<div class="list"><div class="empty">Ajoutez vos plus belles photos.</div></div>'}
+  <button class="btn ghost block" data-act="vit-pick">Choisir dans les photos des clients qui ont dit oui</button>
+  <section class="sec"><div class="sec-h"><h2>Services et prix</h2><button class="btn sm" data-act="new-svc">+ Ajouter</button></div>
+  <div class="list">${S.services.length?S.services.map(s=>`<button class="row" data-act="svc" data-id="${s.id}"><div class="row-main"><div class="row-t">${esc(s.nom)}</div><div class="row-s">${esc(s.desc||'')}</div></div><b style="font-variant-numeric:tabular-nums">${num(s.prix)?fmt(s.prix):'—'}</b></button>`).join(''):'<div class="empty">Ajoutez vos formules : mariage, baptême, studio…</div>'}</div></section>
+  <button class="btn ghost block" data-act="tab" data-v="annonces">${I.mega.replace('<svg','<svg width="18" height="18"')} Annonces d’événements</button>
+  ${ONLINE?`<a class="btn wa block" href="https://wa.me/?text=${encodeURIComponent('Découvrez '+S.shop.nom+' : photos, prix et réservation ici :\n'+portalLink())}" target="_blank" rel="noopener">${I.wa} Partager ma page</a>`:''}`;
+}
+function annCount(id){if(PORTAL){const a=ann_(id);return a?num(a.pris):0}return S.seances.filter(s=>s.annonceId===id&&s.statut!=='annule').length+S.demandes.filter(d=>d.statut==='nouveau'&&d.data&&d.data.annonceId===id).length}
+function annoncesView(){const list=[...(S.annonces||[])].sort((a,b)=>b.date.localeCompare(a.date));
+  return `<div class="sec-h"><h1>Annonces</h1><button class="btn sm" data-act="new-ann">+ Nouvelle</button></div>
+  <p class="note" style="margin:0">Magal, Tabaski, Korité, Gamou… Faites réserver vos clients <b>avant</b> l’événement. L’annonce s’affiche en haut de votre page, et vous la partagez sur WhatsApp.</p>
+  <div class="list">${list.length?list.map(a=>{const n=annCount(a.id);return `<button class="row" data-act="ann" data-id="${a.id}">${a.photo?`<img class="ph-ic" style="width:56px;height:42px;border-radius:8px;object-fit:cover;flex:none" src="${a.photo}" alt="">`:`<div class="av">${I.mega}</div>`}<div class="row-main"><div class="row-t">${esc(a.titre)}</div><div class="row-s">${esc(a.event)} · ${dateFr(a.date,{day:'numeric',month:'long'})}</div><div class="row-s">${plural(n,'réservation','réservations')}${num(a.places)?' / '+num(a.places)+' places':''}</div></div><div class="row-end">${a.actif&&daysTo(a.date)>=0?'<span class="pill st-livre">En ligne</span>':'<span class="pill st-annule">Terminée</span>'}</div></button>`}).join(''):'<div class="empty">Aucune annonce. Créez-en une pour le prochain Magal ou la Tabaski !</div>'}</div>`}
+function allPays(){const out=[];S.seances.forEach(s=>s.paiements.forEach(p=>out.push({...p,ref:s.id,label:s.event+' · '+cNom(s.clientId)})));return out}
+function caisse(){
+  if(!caDay)caDay=today();const ps=allPays().filter(p=>p.date===caDay).sort((a,b)=>(b.heure||'').localeCompare(a.heure||''));const tot=ps.reduce((a,p)=>a+num(p.montant),0);
+  const byMode=MODES.map(m=>[m,ps.filter(p=>p.mode===m).reduce((a,p)=>a+num(p.montant),0)]);
+  const mo=today().slice(0,7);const encMo=allPays().filter(p=>String(p.date).slice(0,7)===mo).reduce((a,p)=>a+num(p.montant),0);
+  const du=S.seances.filter(s=>s.statut!=='annule').reduce((a,s)=>a+reste(s),0);
+  return `<div class="sec-h"><h1>Caisse</h1></div>
+  <div class="navd"><button class="x" data-act="ca-shift" data-v="-1" aria-label="Jour précédent">‹</button><h2 style="text-transform:capitalize">${dayLabel(caDay)}</h2><button class="x" data-act="ca-shift" data-v="1" aria-label="Jour suivant" ${caDay>=today()?'disabled style="opacity:.3"':''}>›</button></div>
+  <div class="panel"><div class="lbl">Total encaissé</div><div class="big-total">${fmt(tot)}</div><div class="money">${byMode.map(([m,v])=>`<div><b>${fmt(v)}</b><span>${m}</span></div>`).join('')}</div></div>
+  <div class="list">${ps.length?ps.map(p=>`<button class="row" data-act="ses" data-id="${p.ref}"><div class="row-main"><div class="row-t">${esc(p.label)}</div><div class="row-s">${esc(p.heure||'')} · ${esc(p.mode)}</div></div><b style="font-variant-numeric:tabular-nums">${fmt(p.montant)}</b></button>`).join(''):'<div class="empty">Rien encaissé ce jour.</div>'}</div>
+  <div class="panel"><div class="lbl">Ce mois</div><div class="kv" style="grid-template-columns:1fr"><div><span>Encaissé</span><b>${fmt(encMo)}</b></div><div><span>Reste à encaisser (toutes les séances)</span><b>${fmt(du)}</b></div></div></div>`;
+}
+const DT={resa:'Réservation',question:'Question',autorise:'Autorisation'};
+function dCl(d){return client(d.clientId)||{nom:d.nomV||'Visiteur',tel:d.telV||'',visiteur:true}}
+function demSummary(d){const x=d.data||{};if(d.type==='resa')return [x.event,x.date?dateFr(x.date,{day:'numeric',month:'long'}):'',x.heure,x.lieu,x.serviceNom].filter(Boolean).join(' · ')+(d.texte?' — '+d.texte:'');
+  if(d.type==='autorise')return x.ok?'Autorise la publication de ses photos':'Ne veut plus que ses photos soient publiées';return d.texte}
+function demRow(d){const cl=dCl(d);return `<button class="row" data-act="dem" data-id="${d.id}"><div class="av">${initials(cl.nom)}</div><div class="row-main"><div class="row-t">${esc(cl.nom)}</div><div class="row-s">${DT[d.type]||d.type} · ${esc(demSummary(d))}</div></div><div class="row-end">${d.statut==='nouveau'?'<span class="pill st-fait">Nouveau</span>':'<span class="pill">Traité</span>'}</div></button>`}
+function demandes(){const list=[...S.demandes].sort((a,b)=>(a.statut===b.statut?String(b.date).localeCompare(String(a.date)):a.statut==='nouveau'?-1:1));
+  return `<div class="sec-h"><h1>Demandes des clients</h1></div><div class="list">${list.length?list.map(demRow).join(''):'<div class="empty">Rien pour le moment.</div>'}</div>`}
+
+/* ---------- côté client ---------- */
+function me(){if(PORTAL)return client(viewAs);if(viewAs==='__guest')return null;if(!viewAs||!client(viewAs))viewAs=(S.clients[0]||{}).id;return client(viewAs)}
+function asPicker(){if(PORTAL){const c=client(viewAs);return c?`<div class="banner"><span class="small">Connecté : <b>${esc(c.nom)}</b></span><button class="btn sm ghost" data-act="pl-out">Se déconnecter</button></div>`:''}
+  return `<div class="banner"><label for="viewAs" class="small">Aperçu en tant que</label><select id="viewAs" data-input="viewAs" class="search" style="width:auto;padding:7px 10px"><option value="__guest" ${viewAs==='__guest'?'selected':''}>Visiteur sans code</option>${S.clients.map(c=>`<option value="${c.id}" ${c.id===viewAs?'selected':''}>${esc(c.nom)}</option>`).join('')}</select></div>`}
+function guest(){try{return JSON.parse(localStorage.getItem('studioPhoto.guest')||'{}')}catch(e){return {}}}
+function saveGuest(nom,tel){try{localStorage.setItem('studioPhoto.guest',JSON.stringify({nom,tel}))}catch(e){}}
+function guestFields(){const g=guest();return `<div class="two"><div class="f"><label for="vz-nom">Votre nom</label><input id="vz-nom" autocomplete="name" value="${esc(g.nom||'')}"></div><div class="f"><label for="vz-tel">Votre numéro WhatsApp</label><input id="vz-tel" inputmode="tel" placeholder="77 000 00 00" value="${esc(g.tel||'')}"></div></div>`}
+function annCard(a,btn){const d=daysTo(a.date);const n=annCount(a.id);const left=num(a.places)?Math.max(0,num(a.places)-n):null;const closed=(a.limite&&daysTo(a.limite)<0)||left===0;
+  return `<div class="ann">${a.photo?`<img src="${a.photo}" alt="">`:''}<div class="ab"><span class="cd">${d===0?'C’est aujourd’hui':d===1?'C’est demain':esc(a.event)+' dans '+d+' jours'}</span><h2>${esc(a.titre)}</h2>${a.texte?`<div class="sm2">${esc(a.texte)}</div>`:''}
+  <div class="sm2">${dateFr(a.date,{weekday:'long',day:'numeric',month:'long'})}${num(a.prix)?' · <b>'+fmt(a.prix)+'</b>':''}${a.limite?' · réservez avant le '+dateFr(a.limite,{day:'numeric',month:'long'}):''}</div>
+  ${left!==null?`<div class="places">${left?'Plus que '+left+' places':'Complet'}</div>`:''}
+  ${btn&&!closed?`<button class="btn gold" data-act="c-ann" data-id="${a.id}">Je réserve pour ${esc(a.event)}</button>`:''}${btn&&closed?'<div class="sm2"><b>Réservations fermées.</b></div>':''}</div></div>`}
+function cStudio(){const pub=FILES.filter(f=>f.public);const cats=[...new Set(pub.map(f=>f.cat).filter(Boolean))];const list=cCat?pub.filter(f=>f.cat===cCat):pub;
+  const anns=(S.annonces||[]).filter(a=>a.actif&&daysTo(a.date)>=0);const s=S.shop;
+  return `${PORTAL||mode!=='client'?'':asPicker()}${typeof a2hs==='function'&&PORTAL?a2hs():''}
+  <div class="hello"><div class="lbl">${esc([s.ville,s.adresse].filter(Boolean).join(' · '))}</div><h1>${esc(s.nom)}</h1>${s.apropos?`<p class="muted" style="margin:0">${esc(s.apropos)}</p>`:''}
+  <div class="btns">${s.insta?`<a class="btn ghost sm" href="https://instagram.com/${esc(s.insta.replace('@',''))}" target="_blank" rel="noopener">Instagram</a>`:''}${s.tiktok?`<a class="btn ghost sm" href="https://www.tiktok.com/@${esc(s.tiktok.replace('@',''))}" target="_blank" rel="noopener">TikTok</a>`:''}</div></div>
+  ${anns.map(a=>annCard(a,true)).join('')}
+  ${pub.length?`<section class="sec"><h2>Nos photos</h2>${cats.length>1?`<div class="cats"><button class="chip ${cCat?'':'on'}" data-act="c-cat" data-v="">Toutes</button>${cats.map(c=>`<button class="chip ${cCat===c?'on':''}" data-act="c-cat" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>`:''}<div class="pg">${list.map(f=>`<button class="pt" data-act="c-photo" data-id="${f.id}"><img src="${f.thumb||f.url}" alt="" loading="lazy"></button>`).join('')}</div></section>`:''}
+  ${S.services.length?`<section class="sec"><h2>Nos prix</h2><div class="list">${S.services.map(x=>`<div class="row"><div class="row-main"><div class="row-t">${esc(x.nom)}</div><div class="row-s">${esc(x.desc||'')}</div></div><b style="font-variant-numeric:tabular-nums">${num(x.prix)?fmt(x.prix):''}</b></div>`).join('')}</div></section>`:''}
+  <button class="btn gold block" data-act="tab" data-v="c-direct">Réserver une séance</button>
+  ${s.tel?`<a class="btn wa block" href="${waLink(s.tel,'Bonjour '+s.nom+', ')}" target="_blank" rel="noopener">${I.wa} Écrire sur WhatsApp</a>`:''}`}
+function cDirect(){const c=me();const anns=(S.annonces||[]).filter(a=>a.actif&&daysTo(a.date)>=0);
+  return `${c||!PORTAL?asPicker():''}<div class="hello"><div class="lbl">${esc(S.shop.nom)}</div><h1>Réserver une séance</h1><p class="muted" style="margin:0">${c?'Le photographe reçoit tout de suite.':'Sans compte, sans code : votre nom et votre numéro suffisent. Le photographe vous confirme sur WhatsApp.'}</p></div>
+  ${anns.map(a=>annCard(a,true)).join('')}
+  <div class="actions"><button class="act" data-act="c-resa">${I.cal}<b>Réserver</b><span>Mariage, baptême, studio…</span></button><button class="act" data-act="c-question">${I.q}<b>Poser une question</b><span>Prix, vidéo, délais…</span></button></div>
+  ${c||!PORTAL?'':'<p class="note" style="margin:0;text-align:center">Vous avez déjà un code du photographe ? Allez dans « Mes photos ».</p>'}`}
+function cAccueil(){const c=me();if(!c)return PORTAL?portalLogin():asPicker()+'<div class="empty">Choisissez un client en haut pour voir son espace (avec code).</div>';
+  const ss=S.seances.filter(s=>s.clientId===c.id&&s.statut!=='annule').sort((a,b)=>b.date.localeCompare(a.date));
+  return `${asPicker()}${typeof a2hs==='function'?a2hs():''}<div class="hello"><div class="lbl">${esc(S.shop.nom)}</div><h1>Bonjour ${esc(c.nom.split(' ')[0])}</h1></div>
+  ${ss.length?ss.map(cSesCard).join(''):'<div class="list"><div class="empty">Pas encore de séance.</div></div>'}
+  <div class="panel"><label class="small" style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" id="c-aut" data-act="c-aut" ${c.autorise?'checked':''} style="width:22px;height:22px;flex:none;margin-top:1px"> <span>J’autorise ${esc(S.shop.nom)} à montrer quelques-unes de mes photos dans sa vitrine et sur ses réseaux.</span></label></div>
+  ${S.shop.tel?`<a class="btn wa block" href="${waLink(S.shop.tel,'Bonjour '+S.shop.nom+', ')}" target="_blank" rel="noopener">${I.wa} Écrire au photographe</a>`:''}`}
+function cSesCard(s){const fs=filesOf(s.id);const r=reste(s);const exp=fs.map(f=>f.expire).filter(Boolean).sort()[0];
+  const lots=[];for(let i=0;i<fs.length;i+=20)lots.push([i,Math.min(fs.length,i+20)]);
+  return `<div class="panel"><div class="sec-h"><div><div class="row-t">${esc(s.event)}</div><div class="row-s">${dateFr(s.date,{weekday:'long',day:'numeric',month:'long'})}${s.lieu?' · '+esc(s.lieu):''}</div></div><span class="pill st-${s.statut}">${SS[s.statut]}</span></div>
+  ${num(s.prix)?`<div class="money"><div><b>${fmt(s.prix)}</b><span>Prix</span></div><div><b>${fmt(sumP(s.paiements))}</b><span>Payé</span></div><div><b style="color:${r?'var(--bad)':'var(--ok)'}">${fmt(r)}</b><span>Reste</span></div></div>`:''}
+  ${s.statut==='livre'&&fs.length?`<div class="reply" style="background:var(--ok-soft);color:var(--ok)"><b>Vos ${fs.length} photos sont prêtes !</b>${exp?' Enregistrez-les avant le '+dateFr(exp,{day:'numeric',month:'long'})+' : ensuite elles sont effacées.':''}</div>
+    <div class="pg">${fs.map((f,i)=>`<button class="pt" data-act="c-view" data-id="${s.id}" data-v="${i}"><img src="${f.thumb||f.url}" alt="Photo ${i+1}" loading="lazy"></button>`).join('')}</div>
+    <div class="lots">${lots.map(([a,b],k)=>`<button class="btn ${k?'ghost':'gold'}" data-act="c-lot" data-id="${s.id}" data-v="${a}">${lots.length>1?'Enregistrer les photos '+(a+1)+' à '+b:'Enregistrer les '+fs.length+' photos sur mon téléphone'}</button>`).join('')}</div>`
+  :s.statut==='prevu'?`<div class="small">Séance prévue ${dayLabel(s.date).toLowerCase()}${s.heure?' à '+esc(s.heure):''}.</div>`:'<div class="small muted">Le photographe prépare vos photos. Vous les verrez ici.</div>'}</div>`}
+function cMessages(){const c=me();if(!c)return PORTAL?`<div class="hello"><div class="lbl">${esc(S.shop.nom)}</div><h1>Une question ?</h1><p class="muted" style="margin:0">Écrivez sans code. Le photographe vous répond sur WhatsApp.</p></div><button class="btn block" data-act="c-question">Poser une question</button>`:asPicker()+'<div class="empty">Choisissez un client en haut.</div>';
+  const list=S.demandes.filter(d=>d.clientId===c.id&&d.type!=='autorise').sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  return `${asPicker()}<div class="sec-h"><h1>Mes messages</h1><button class="btn sm" data-act="c-question">+ Question</button></div>
+  ${list.length?list.map(d=>`<div class="msg"><div class="sec-h"><span class="lbl">${DT[d.type]||d.type} · ${dateFr(d.date,{day:'numeric',month:'short'})}</span>${d.statut==='nouveau'?'<span class="pill">En attente</span>':'<span class="pill st-livre">Répondu</span>'}</div><div>${esc(demSummary(d))}</div>${d.reponse?`<div class="reply"><b>Photographe :</b> ${esc(d.reponse)}</div>`:''}</div>`).join(''):'<div class="list"><div class="empty">Aucun message.</div></div>'}`}
+
+/* ---------- feuilles : séance ---------- */
+function opts(arr,sel){return arr.map(v=>`<option ${v===sel?'selected':''}>${esc(v)}</option>`).join('')}
+function clientSelect(id,sel,pre){return `<div class="f"><label for="${id}">Client</label><select id="${id}" data-newc="${id}"><option value="">— Choisir —</option><option value="__new" ${sel==='__new'?'selected':''}>+ Nouveau client</option>${[...S.clients].sort((a,b)=>a.nom.localeCompare(b.nom)).map(c=>`<option value="${c.id}" ${c.id===sel?'selected':''}>${esc(c.nom)}</option>`).join('')}</select></div>
+  <div class="two" id="${id}-new" ${sel==='__new'?'':'hidden'}><div class="f"><label for="${id}-nom">Nom</label><input id="${id}-nom" value="${esc(pre&&pre.nom||'')}"></div><div class="f"><label for="${id}-tel">Téléphone</label><input id="${id}-tel" inputmode="tel" value="${esc(pre&&pre.tel||'')}" placeholder="77 000 00 00"></div></div>`}
+function readClient(id){let cid=val(id);if(cid==='__new'){const nom=val(id+'-nom');if(!nom){toast('Écrivez le nom du client');return null}const nc={id:uid(),nom,tel:val(id+'-tel'),note:'',code:newCode(),autorise:false};S.clients.push(nc);cid=nc.id}return cid}
+function sesForm(s,pre){const isNew=!s;s=s||{clientId:pre&&pre.clientId||'',event:pre&&pre.event||'Mariage',date:pre&&pre.date||addDays(7),heure:pre&&pre.heure||'',lieu:pre&&pre.lieu||'',prix:pre&&pre.prix||'',note:pre&&pre.note||'',annonceId:pre&&pre.annonceId||''};
+  sheet(isNew?'Nouvelle séance':'Modifier la séance',`<div class="panel">${clientSelect('sf-c',s.clientId,pre)}
+  <div class="f"><label for="sf-ev">Événement</label><select id="sf-ev">${opts(EVENTS,s.event)}</select></div>
+  <div class="two"><div class="f"><label for="sf-d">Date</label><input type="date" id="sf-d" value="${esc(s.date)}"></div><div class="f"><label for="sf-h">Heure</label><input type="time" id="sf-h" value="${esc(s.heure)}"></div></div>
+  <div class="f"><label for="sf-l">Lieu</label><input id="sf-l" value="${esc(s.lieu)}" placeholder="ex. Mairie de Mermoz"></div>
+  <div class="two"><div class="f"><label for="sf-p">Prix (F)</label><input id="sf-p" inputmode="numeric" value="${esc(s.prix)}"></div>${isNew?`<div class="f"><label for="sf-av">Avance reçue</label><input id="sf-av" inputmode="numeric" placeholder="0"></div>`:'<div></div>'}</div>
+  ${isNew?`<div class="f"><label for="sf-avm">Avance payée par</label><select id="sf-avm">${opts(MODES)}</select></div>`:''}
+  ${(S.annonces||[]).length?`<div class="f"><label for="sf-ann">Annonce</label><select id="sf-ann"><option value="">— Aucune —</option>${S.annonces.map(a=>`<option value="${a.id}" ${a.id===s.annonceId?'selected':''}>${esc(a.titre)}</option>`).join('')}</select></div>`:''}
+  <div class="f"><label for="sf-n">Note</label><textarea id="sf-n" placeholder="ex. 2 tenues, photos de famille">${esc(s.note)}</textarea></div></div>
+  <button class="btn block" data-act="save-ses" data-id="${s.id||''}" data-dem="${pre&&pre.demId||''}">Enregistrer</button>`)}
+function sesSheet(id){const s=ses_(id);if(!s)return;const c=client(s.clientId)||{nom:'?',tel:''};const i=SSTEPS.indexOf(s.statut);const r=reste(s);const fs=filesOf(s.id);
+  const rap=`Bonjour ${c.nom}, rappel de votre séance photo (${s.event}) ${dayLabel(s.date).toLowerCase()}${s.heure?' à '+s.heure:''}${s.lieu?', '+s.lieu:''}. À bientôt ! ${S.shop.nom}`;
+  sheet(s.event+' · '+c.nom,`<div class="panel"><div class="sec-h"><div><div class="row-t">${esc(c.nom)}</div><div class="row-s">${dateFr(s.date,{weekday:'long',day:'numeric',month:'long'})}${s.heure?' · '+esc(s.heure):''}${s.lieu?' · '+esc(s.lieu):''}</div></div><span class="pill st-${s.statut}">${SS[s.statut]}</span></div>
+  ${s.note?`<div class="small">${esc(s.note)}</div>`:''}${s.annonceId&&ann_(s.annonceId)?`<div class="small muted">Annonce : ${esc(ann_(s.annonceId).titre)}</div>`:''}
+  <div class="lbl">Étape (touchez)</div><div class="steps">${SSTEPS.map((x,k)=>`<button class="step ${k<=i?'done':''}" data-act="ses-st" data-id="${s.id}" data-v="${x}"><i></i>${SS[x]}</button>`).join('')}</div></div>
+  <div class="panel"><div class="money"><div><b>${fmt(s.prix)}</b><span>Prix</span></div><div><b>${fmt(sumP(s.paiements))}</b><span>Payé</span></div><div><b style="color:${r?'var(--bad)':'var(--ok)'}">${fmt(r)}</b><span>Reste</span></div></div>
+  ${s.paiements.length?`<div class="kv" style="grid-template-columns:1fr">${s.paiements.map(p=>`<div><span>${dateFr(p.date,{day:'numeric',month:'short'})} · ${esc(p.mode)}</span><b>${fmt(p.montant)}</b></div>`).join('')}</div>`:''}
+  ${r||!num(s.prix)?`<div class="two"><div class="f"><label for="pay-m">Paiement</label><input id="pay-m" inputmode="numeric" placeholder="${r||''}"></div><div class="f"><label for="pay-mo">Par</label><select id="pay-mo">${opts(MODES)}</select></div></div><button class="btn gold" data-act="ses-pay" data-id="${s.id}">Ajouter le paiement</button>`:''}</div>
+  <div class="panel"><div class="sec-h"><h3>Photos · ${fs.length}</h3>${fs.length?`<button class="btn sm ghost" data-act="sel-toggle" data-id="${s.id}">${selMode?'Terminer':'Choisir'}</button>`:''}</div>
+  ${fs.length?`<div class="pg" id="sesPg">${fs.map(f=>`<button class="pt ${SEL.has(f.id)?'sel':''}" data-act="ses-photo" data-id="${f.id}" data-v="${s.id}"><img src="${f.thumb||f.url}" alt="" loading="lazy">${selMode?'<span class="ck"></span>':''}${f.public?'<span class="pub">Vitrine</span>':''}</button>`).join('')}</div>`:'<div class="small muted">Après la séance, ajoutez les photos ici : le client les reçoit dans son espace.</div>'}
+  ${selMode?`<div class="btns"><span class="small" style="align-self:center"><b>${SEL.size}</b> choisie(s)</span>${c.autorise?`<button class="btn sm gold" data-act="sel-pub" data-id="${s.id}">Mettre en vitrine</button>`:''}<button class="btn sm danger" data-act="sel-del" data-id="${s.id}">Supprimer</button></div>${c.autorise?'':'<div class="small muted">Le client n’a pas autorisé la publication : pas de vitrine.</div>'}`:''}
+  <label class="btn ${fs.length?'ghost':'gold'} block" for="up-in-${s.id}">+ Ajouter des photos<input type="file" accept="image/*" multiple id="up-in-${s.id}" data-up="${s.id}" hidden></label>
+  <div id="upProg"></div></div>
+  <div class="btns">${fs.length&&s.statut!=='livre'?`<button class="btn gold" data-act="ses-livrer" data-id="${s.id}">Livrer les photos au client</button>`:''}
+  ${s.statut==='livre'&&c.tel?`<a class="btn wa" href="${waLink(c.tel,livreMsg(s))}" target="_blank" rel="noopener">${I.wa} Renvoyer le lien</a>`:''}
+  ${s.statut==='prevu'&&c.tel?`<a class="btn wa" href="${waLink(c.tel,rap)}" target="_blank" rel="noopener">${I.wa} Rappel</a>`:''}
+  <button class="btn ghost" data-act="edit-ses" data-id="${s.id}">Modifier</button>${client(s.clientId)?`<button class="btn ghost" data-act="client" data-id="${s.clientId}">Fiche client</button>`:''}</div>
+  <div class="btns"><button class="btn danger sm" data-act="ses-st" data-id="${s.id}" data-v="annule">Annuler la séance</button><button class="btn danger sm" data-act="del-ses" data-id="${s.id}">Supprimer</button></div>`)}
+function livreMsg(s){const c=client(s.clientId)||{};const fs=filesOf(s.id);const exp=fs.map(f=>f.expire).filter(Boolean).sort()[0];
+  return `Bonjour ${c.nom}, vos photos (${s.event}) sont prêtes ! 📸\n\nOuvrez : ${portalLink()}\nNuméro : ${c.tel}\nCode : ${c.code}\n\n${fs.length} photos. Enregistrez-les sur votre téléphone${exp?' avant le '+dateFr(exp,{day:'numeric',month:'long'}):''} : ensuite elles sont effacées.\n${S.shop.nom}`}
+function upProgress(d,n){const e=$('#upProg');if(e)e.innerHTML=`<div class="small">Envoi ${d} / ${n}…</div><div class="prog"><i style="width:${Math.round(d/n*100)}%"></i></div>`}
+
+/* ---------- feuilles : clients, vitrine, annonces ---------- */
+function accessMsg_(c){return typeof accessMsg==='function'?accessMsg(c):''}
+function clientForm(c){c=c||{nom:'',tel:'',note:''};
+  sheet(c.id?'Modifier le client':'Nouveau client',`<div class="panel"><div class="f"><label for="cl-nom">Nom</label><input id="cl-nom" value="${esc(c.nom)}" placeholder="ex. Fatou & Ibrahima"></div><div class="f"><label for="cl-tel">Téléphone (WhatsApp)</label><input id="cl-tel" inputmode="tel" value="${esc(c.tel)}" placeholder="77 000 00 00"></div><div class="f"><label for="cl-note">Note</label><textarea id="cl-note">${esc(c.note)}</textarea></div></div><button class="btn block" data-act="save-client" data-id="${c.id||''}">Enregistrer</button>`)}
+function clientSheet(id){const c=client(id);if(!c)return;const ss=S.seances.filter(s=>s.clientId===id).sort((a,b)=>b.date.localeCompare(a.date));const fs=filesClient(id).filter(f=>!f.public||f.expire);const exp=fs.map(f=>f.expire).filter(Boolean).sort()[0];
+  sheet(c.nom,`<div class="panel"><div class="row-s">${esc(c.tel)}</div>${c.note?`<div class="small">${esc(c.note)}</div>`:''}
+  <div class="btns">${c.tel?`<a class="btn wa sm" href="${waLink(c.tel,'Bonjour '+c.nom+', ')}" target="_blank" rel="noopener">${I.wa} WhatsApp</a>`:''}<button class="btn ghost sm" data-act="edit-client" data-id="${c.id}">Modifier</button><button class="btn sm" data-act="new-ses-for" data-id="${c.id}">+ Séance</button></div></div>
+  <div class="panel"><div class="sec-h"><h3>Espace client</h3><span class="code">${esc(c.code||'—')}</span></div><div class="small muted">Avec son numéro et ce code, ${esc(c.nom.split(' ')[0])} voit et enregistre ses photos.</div><div class="btns">${c.tel?`<a class="btn wa sm" href="${waLink(c.tel,accessMsg_(c))}" target="_blank" rel="noopener">${I.wa} Envoyer l’accès</a>`:''}<button class="btn ghost sm" data-act="new-code" data-id="${c.id}">Nouveau code</button></div></div>
+  <div class="panel"><div class="sec-h"><h3>Photos en ligne · ${fs.length}</h3></div>${exp?`<div class="small">Effacées le <b>${dateFr(exp,{day:'numeric',month:'long'})}</b>.</div><button class="btn ghost sm" data-act="prolong" data-id="${c.id}">Prolonger de ${KEEP} jours</button>`:'<div class="small muted">Aucune photo en ligne.</div>'}
+  <label class="small" style="display:flex;gap:10px;align-items:center;margin-top:4px"><input type="checkbox" data-act="cl-aut" data-id="${c.id}" ${c.autorise?'checked':''} style="width:22px;height:22px"> Le client autorise la publication (vitrine, réseaux)</label></div>
+  ${ss.length?`<section class="sec"><h3>Séances</h3><div class="timeline">${ss.map(s=>sesRow(s,false)).join('')}</div></section>`:''}
+  <button class="btn danger sm" data-act="del-client" data-id="${c.id}">Supprimer le client et ses photos</button>`)}
+function svcForm(s){s=s||{nom:'',prix:'',desc:''};
+  sheet(s.id?'Modifier':'Nouveau service',`<div class="panel"><div class="f"><label for="sv-nom">Service</label><input id="sv-nom" value="${esc(s.nom)}" placeholder="ex. Mariage (journée)"></div><div class="f"><label for="sv-prix">Prix (F)</label><input id="sv-prix" inputmode="numeric" value="${esc(s.prix)}"></div><div class="f"><label for="sv-desc">Ce qui est inclus</label><textarea id="sv-desc" placeholder="ex. 300 photos retouchées, livrées en 7 jours">${esc(s.desc)}</textarea></div></div>
+  <button class="btn block" data-act="save-svc" data-id="${s.id||''}">Enregistrer</button>${s.id?`<button class="btn danger sm" data-act="del-svc" data-id="${s.id}">Retirer</button>`:''}`)}
+function vitAddSheet(){sheet('Photos pour la vitrine',`<div class="panel"><div class="f"><label for="va-cat">Catégorie</label><select id="va-cat">${opts(EVENTS,'Mariage')}</select></div>
+  <p class="small muted" style="margin:0">Ces photos restent sur votre page (elles ne s’effacent pas).</p>
+  <label class="btn gold block" for="va-in">Choisir les photos<input type="file" accept="image/*" multiple id="va-in" data-vit="1" hidden></label><div id="upProg"></div></div>`)}
+function vitPickSheet(){const ok=S.clients.filter(c=>c.autorise);const fs=FILES.filter(f=>!f.public&&ok.some(c=>c.id===f.clientId));SEL=new Set();
+  sheet('Photos des clients qui ont dit oui',fs.length?`<div class="small muted">Touchez les photos à mettre en vitrine.</div><div class="pg" id="pickPg">${fs.map(f=>`<button class="pt" data-act="pick-ph" data-id="${f.id}"><img src="${f.thumb||f.url}" alt="" loading="lazy"><span class="ck"></span></button>`).join('')}</div><button class="btn gold block" data-act="pick-save">Mettre en vitrine</button>`:'<div class="empty">Aucun client n’a encore autorisé la publication.</div>')}
+function annForm(a){const isNew=!a;a=a||{titre:'',event:'Magal',date:addDays(14),limite:addDays(12),prix:'',places:'',texte:'',photo:'',actif:true};
+  sheet(isNew?'Nouvelle annonce':'Modifier l’annonce',`<div class="panel"><div class="f"><label for="an-ev">Événement</label><select id="an-ev">${opts(EVENTS,a.event)}</select></div>
+  <div class="f"><label for="an-t">Titre</label><input id="an-t" value="${esc(a.titre)}" placeholder="ex. Magal de Touba : réservez votre séance photo"></div>
+  <div class="f"><label for="an-x">Message</label><textarea id="an-x" placeholder="ex. Photos de famille devant la Grande Mosquée, livrées en 48 h. Places limitées !">${esc(a.texte)}</textarea></div>
+  <div class="two"><div class="f"><label for="an-d">Date de l’événement</label><input type="date" id="an-d" value="${esc(a.date)}"></div><div class="f"><label for="an-l">Réserver avant le</label><input type="date" id="an-l" value="${esc(a.limite||'')}"></div></div>
+  <div class="two"><div class="f"><label for="an-p">Prix (F)</label><input id="an-p" inputmode="numeric" value="${esc(a.prix)}"></div><div class="f"><label for="an-pl">Nombre de places</label><input id="an-pl" inputmode="numeric" value="${esc(a.places)}" placeholder="sans limite"></div></div>
+  <div class="f"><label>Image (facultatif)</label>${a.photo?`<img src="${a.photo}" alt="" style="width:100%;border-radius:12px;aspect-ratio:16/9;object-fit:cover">`:''}<label class="btn ghost" for="an-img">${a.photo?'Changer l’image':'Ajouter une image'}<input type="file" accept="image/*" id="an-img" data-annimg="1" hidden></label></div>
+  <label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="an-on" ${a.actif?'checked':''} style="width:22px;height:22px"> Afficher sur ma page</label></div>
+  <button class="btn block" data-act="save-ann" data-id="${a.id||''}">Enregistrer</button>${a.id?`<button class="btn danger sm" data-act="del-ann" data-id="${a.id}">Supprimer l’annonce</button>`:''}`);annImg=a.photo||''}
+let annImg='';
+function annShareText(a){return `📸 ${a.titre}\n\n${a.texte?a.texte+'\n\n':''}🗓️ ${dateFr(a.date,{weekday:'long',day:'numeric',month:'long'})}${num(a.prix)?'\n💰 '+fmt(a.prix):''}${num(a.places)?'\n👥 '+num(a.places)+' places seulement':''}${a.limite?'\n⏳ Réservez avant le '+dateFr(a.limite,{day:'numeric',month:'long'}):''}\n\nRéservez ici : ${portalLink()}\n${S.shop.nom}${S.shop.tel?' · '+S.shop.tel:''}`}
+function annSheet(id){const a=ann_(id);if(!a)return;const ss=S.seances.filter(s=>s.annonceId===id&&s.statut!=='annule');const dm=S.demandes.filter(d=>d.statut==='nouveau'&&d.data&&d.data.annonceId===id);
+  sheet('Annonce',`${annCard(a,false)}
+  <a class="btn wa block" href="https://wa.me/?text=${encodeURIComponent(annShareText(a))}" target="_blank" rel="noopener">${I.wa} Partager sur WhatsApp (statut, groupes)</a>
+  <div class="panel"><div class="sec-h"><h3>Réservations</h3><span class="small muted">${ss.length+dm.length}${num(a.places)?' / '+num(a.places):''}</span></div>
+  ${dm.length?`<div class="lbl">À confirmer</div><div class="list" style="box-shadow:none">${dm.map(demRow).join('')}</div>`:''}
+  ${ss.length?`<div class="lbl">Confirmées</div><div class="timeline">${ss.map(s=>sesRow(s)).join('')}</div>`:''}${!ss.length&&!dm.length?'<div class="small muted">Pas encore de réservation. Partagez l’annonce !</div>':''}</div>
+  <div class="btns"><button class="btn ghost" data-act="edit-ann" data-id="${a.id}">Modifier</button><button class="btn ghost" data-act="ann-ses" data-id="${a.id}">+ Séance pour cette annonce</button></div>`)}
+function demSheet(id){const d=S.demandes.find(x=>x.id===id);if(!d)return;const cl=dCl(d);
+  sheet((DT[d.type]||'Message')+' · '+cl.nom,`<div class="panel">${cl.visiteur?`<div class="reply"><b>Nouveau client</b> : ${esc(cl.nom)} · ${esc(cl.tel)}. Il sera ajouté à vos clients si vous confirmez.</div>`:''}<div>${esc(demSummary(d))}</div><div class="small muted">Reçu le ${dateFr(d.date,{day:'numeric',month:'long'})}</div></div>
+  ${d.type==='resa'?`<button class="btn gold block" data-act="dem-ses" data-id="${d.id}">Confirmer : créer la séance</button>`:''}
+  <div class="panel"><div class="f"><label for="dm-rep">Votre réponse (le client la voit sur sa page s’il a un code)</label><textarea id="dm-rep">${esc(d.reponse)}</textarea></div><div class="btns"><button class="btn" data-act="dem-reply" data-id="${d.id}">Répondre</button>${cl.tel?`<button class="btn wa" data-act="dem-wa" data-id="${d.id}">${I.wa} WhatsApp</button>`:''}</div></div>`)}
+function settings(){const s=S.shop;
+  sheet('Réglages du studio',`<div class="panel"><div class="f"><label for="st-nom">Nom du studio</label><input id="st-nom" value="${esc(s.nom)}"></div>
+  <div class="two"><div class="f"><label for="st-tel">Téléphone WhatsApp</label><input id="st-tel" inputmode="tel" value="${esc(s.tel)}"></div><div class="f"><label for="st-v">Ville</label><input id="st-v" value="${esc(s.ville)}"></div></div>
+  <div class="f"><label for="st-adr">Adresse</label><input id="st-adr" value="${esc(s.adresse||'')}"></div>
+  <div class="two"><div class="f"><label for="st-ig">Instagram</label><input id="st-ig" value="${esc(s.insta||'')}" placeholder="sans @"></div><div class="f"><label for="st-tk">TikTok</label><input id="st-tk" value="${esc(s.tiktok||'')}" placeholder="sans @"></div></div>
+  <div class="f"><label for="st-ap">Présentation (sur votre page)</label><textarea id="st-ap">${esc(s.apropos||'')}</textarea></div>
+  <label class="small" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="st-bl" ${s.bloquer?'checked':''} style="width:22px;height:22px"> Me prévenir avant de livrer les photos si le client n’a pas tout payé</label></div>
+  <button class="btn block" data-act="save-settings">Enregistrer</button>${ONLINE?onlineSettings():''}`)}
+
+/* ---------- feuilles côté client ---------- */
+function cResa(annId){const c=me();const a=annId&&ann_(annId);
+  sheet(a?'Réserver · '+a.event:'Réserver une séance',`<div class="panel">${a?`<div class="small"><b>${esc(a.titre)}</b><br>${dateFr(a.date,{weekday:'long',day:'numeric',month:'long'})}${num(a.prix)?' · '+fmt(a.prix):''}</div>`:`
+  <div class="f"><label for="cr-ev">Événement</label><select id="cr-ev">${opts(EVENTS,'Mariage')}</select></div>
+  ${S.services.length?`<div class="f"><label for="cr-sv">Formule</label><select id="cr-sv"><option value="">— Je ne sais pas encore —</option>${S.services.map(x=>`<option value="${x.id}">${esc(x.nom)}${num(x.prix)?' · '+fmt(x.prix):''}</option>`).join('')}</select></div>`:''}
+  <div class="two"><div class="f"><label for="cr-d">Date</label><input type="date" id="cr-d" value="${addDays(7)}" min="${today()}"></div><div class="f"><label for="cr-h">Heure</label><input type="time" id="cr-h"></div></div>`}
+  <div class="f"><label for="cr-l">Lieu</label><input id="cr-l" placeholder="${a?'ex. maison familiale':'ex. Mairie de Mermoz'}"></div>
+  <div class="f"><label for="cr-t">Message (facultatif)</label><textarea id="cr-t" placeholder="ex. nous serons 6 personnes"></textarea></div>${c?'':guestFields()}</div>
+  <button class="btn gold block" data-act="cr-send" data-id="${a?a.id:''}">Envoyer la réservation</button>`)}
+function cQuestion(){sheet('Poser une question',`<div class="panel"><div class="f"><label for="cm-t">Votre question</label><textarea id="cm-t"></textarea></div>${me()?'':guestFields()}</div><button class="btn block" data-act="cq-send">Envoyer</button>`)}
+function guestCheck(){const nom=val('vz-nom'),tel=val('vz-tel');if(nom.length<2){toast('Écrivez votre nom');return null}if(tel.replace(/\D/g,'').length<9){toast('Écrivez votre numéro WhatsApp');return null}saveGuest(nom,tel);return {nom,tel}}
+async function clientSend(d,btn){const c=me();if(!c){const g=guestCheck();if(!g)return;d.clientId=null;d.nomV=g.nom;d.telV=g.tel}else d.clientId=c.id;return sendDem(d,btn)}
+function ensureClient(d){if(client(d.clientId))return d.clientId;const ph=String(d.telV||'').replace(/\D/g,'').slice(-9);let ex=ph.length===9&&S.clients.find(c=>String(c.tel).replace(/\D/g,'').slice(-9)===ph);
+  if(!ex){ex={id:uid(),nom:d.nomV||'Nouveau client',tel:d.telV||'',note:'',code:newCode(),autorise:false};S.clients.push(ex);save()}return ex.id}
+
+/* ---------- actions ---------- */
+const A={
+  mode:e=>{mode=e.dataset.v;view=mode==='studio'?'accueil':'c-studio';q='';render();scrollTo(0,0)},
+  tab:e=>{view=e.dataset.v;q='';selMode=false;SEL=new Set();if($('#sheetRoot').innerHTML)closeSheet();render();scrollTo(0,0)},
+  close:()=>closeSheet(),
+  'clear-demo':()=>{S=fixState({v:1,demo:false,shop:{nom:'Mon studio',tel:'',ville:'',adresse:'',insta:'',tiktok:'',apropos:'',bloquer:false},services:[],annonces:[],clients:[],seances:[],demandes:[],files:[]});FILES=S.files;viewAs=null;save();render();settings();toast('Exemples effacés')},
+  settings,
+  'save-settings':()=>{S.shop={...S.shop,nom:val('st-nom')||'Mon studio',tel:val('st-tel'),ville:val('st-v'),adresse:val('st-adr'),insta:val('st-ig').replace('@',''),tiktok:val('st-tk').replace('@',''),apropos:val('st-ap'),bloquer:$('#st-bl').checked};save();closeSheet();render();toast('Enregistré')},
+  'ag-f':e=>{agF=e.dataset.v;render()},
+  'new-ses':()=>sesForm(),
+  'new-ses-for':e=>sesForm(null,{clientId:e.dataset.id}),
+  'edit-ses':e=>sesForm(ses_(e.dataset.id)),
+  ses:e=>{selMode=false;SEL=new Set();sesSheet(e.dataset.id)},
+  'save-ses':e=>{const cid=readClient('sf-c');if(cid===null)return;if(!cid)return toast('Choisissez un client');const d={clientId:cid,event:val('sf-ev'),date:val('sf-d')||today(),heure:val('sf-h'),lieu:val('sf-l'),prix:num(val('sf-p')),note:val('sf-n'),annonceId:val('sf-ann')};
+    let s;if(e.dataset.id){s=ses_(e.dataset.id);Object.assign(s,d)}else{const av=num(val('sf-av'));s={id:uid(),...d,statut:'prevu',paiements:av?[{id:uid(),montant:av,mode:val('sf-avm'),date:today(),heure:nowHm()}]:[]};S.seances.push(s)}
+    if(e.dataset.dem){const dm=S.demandes.find(x=>x.id===e.dataset.dem);if(dm){dm.statut='traite';dm.reponse=dm.reponse||`C’est confirmé : ${s.event}, ${dateFr(s.date,{weekday:'long',day:'numeric',month:'long'})}${s.heure?' à '+s.heure:''}.`;demSave(dm)}}
+    save();closeSheet();render();sesSheet(s.id);toast('Séance enregistrée')},
+  'ses-st':e=>{const s=ses_(e.dataset.id);const v=e.dataset.v;if(v==='annule'&&delArm!=='an'+s.id){delArm='an'+s.id;e.textContent='Touchez encore pour annuler';return}
+    if(v==='livre')return A['ses-livrer'](e);s.statut=v;save();render();sesSheet(s.id)},
+  'ses-livrer':e=>{const s=ses_(e.dataset.id);const c=client(s.clientId)||{};if(!filesOf(s.id).length)return toast('Ajoutez d’abord les photos');
+    if(S.shop.bloquer&&reste(s)&&delArm!=='lv'+s.id){delArm='lv'+s.id;return toast('Le client doit encore '+fmt(reste(s))+' : touchez encore pour livrer quand même')}
+    s.statut='livre';s.dateLivre=today();save();render();sesSheet(s.id);if(c.tel)window.open(waLink(c.tel,livreMsg(s)),'_blank','noopener');toast('Photos livrées : le client les voit dans son espace')},
+  'ses-pay':e=>{const s=ses_(e.dataset.id);const m=num(val('pay-m'));if(!m)return toast('Écrivez le montant');s.paiements.push({id:uid(),montant:m,mode:val('pay-mo'),date:today(),heure:nowHm()});save();render();sesSheet(s.id);toast(reste(s)?'Paiement ajouté':'Tout est payé')},
+  'del-ses':async e=>{if(delArm!==e.dataset.id){delArm=e.dataset.id;e.textContent='Touchez encore : la séance et ses photos';return}const id=e.dataset.id;await filesRemove(filesOf(id).map(f=>f.id));S.seances=S.seances.filter(s=>s.id!==id);save();closeSheet();render();toast('Séance supprimée')},
+  'sel-toggle':e=>{selMode=!selMode;SEL=new Set();sesSheet(e.dataset.id)},
+  'ses-photo':e=>{const f=FILES.find(x=>x.id===e.dataset.id);if(selMode){SEL.has(f.id)?SEL.delete(f.id):SEL.add(f.id);e.classList.toggle('sel');const b=document.querySelector('.btns .small b');if(b)b.textContent=SEL.size;return}const list=filesOf(e.dataset.v);lightbox(list,list.indexOf(f),false)},
+  'sel-del':async e=>{if(!SEL.size)return toast('Choisissez des photos');if(delArm!=='sd'){delArm='sd';e.textContent='Touchez encore pour supprimer '+SEL.size;return}await filesRemove(SEL);SEL=new Set();selMode=false;render();sesSheet(e.dataset.id);toast('Supprimées')},
+  'sel-pub':async e=>{if(!SEL.size)return toast('Choisissez des photos');const s=ses_(e.dataset.id);await filesPatch(SEL,{public:true,expire:null,cat:s.event});SEL=new Set();selMode=false;render();sesSheet(s.id);toast('Ajoutées à la vitrine')},
+  'up-pick':()=>{const list=S.seances.filter(s=>s.statut!=='annule').sort((a,b)=>b.date.localeCompare(a.date));
+    sheet('Envoyer des photos',list.length?`<div class="small muted">Pour quelle séance ?</div><div class="timeline">${list.slice(0,20).map(s=>sesRow(s)).join('')}</div>`:'<div class="empty">Créez d’abord une séance.</div><button class="btn block" data-act="new-ses">+ Séance</button>')},
+  'new-client':()=>clientForm(),
+  'edit-client':e=>clientForm(client(e.dataset.id)),
+  'save-client':e=>{const nom=val('cl-nom');if(!nom)return toast('Écrivez le nom');const d={nom,tel:val('cl-tel'),note:val('cl-note')};let id=e.dataset.id;if(id)Object.assign(client(id),d);else{id=uid();S.clients.push({id,...d,code:newCode(),autorise:false})}save();render();clientSheet(id)},
+  client:e=>{if(client(e.dataset.id))clientSheet(e.dataset.id)},
+  'new-code':e=>{const c=client(e.dataset.id);c.code=newCode();save();clientSheet(c.id);toast('Nouveau code : '+c.code)},
+  'cl-aut':e=>{const c=client(e.dataset.id);c.autorise=e.checked;save();render();toast(c.autorise?'Publication autorisée':'Publication non autorisée')},
+  prolong:async e=>{const c=client(e.dataset.id);const fs=filesClient(c.id).filter(f=>!f.public&&f.expire);const ne=shift(fs.map(f=>f.expire).sort().pop()||today(),KEEP);await filesPatch(fs.map(f=>f.id),{expire:ne});clientSheet(c.id);toast('Gardées jusqu’au '+dateFr(ne,{day:'numeric',month:'long'}))},
+  'del-client':async e=>{if(delArm!==e.dataset.id){delArm=e.dataset.id;e.textContent='Touchez encore pour tout supprimer';return}const id=e.dataset.id;await filesRemove(filesClient(id).filter(f=>!f.public).map(f=>f.id));S.seances=S.seances.filter(s=>s.clientId!==id);S.clients=S.clients.filter(c=>c.id!==id);save();closeSheet();render();toast('Client supprimé')},
+  'vit-cat':e=>{vitCat=e.dataset.v;render()},
+  'vit-add':()=>vitAddSheet(),
+  'vit-pick':()=>vitPickSheet(),
+  'pick-ph':e=>{const id=e.dataset.id;SEL.has(id)?SEL.delete(id):SEL.add(id);e.classList.toggle('sel')},
+  'pick-save':async()=>{if(!SEL.size)return toast('Choisissez des photos');const ids=[...SEL];for(const id of ids){const f=FILES.find(x=>x.id===id);const s=ses_(f.seanceId);await filesPatch([id],{public:true,expire:null,cat:f.cat||(s?s.event:'')})}SEL=new Set();closeSheet();render();toast('Ajoutées à la vitrine')},
+  'vit-photo':e=>{const f=FILES.find(x=>x.id===e.dataset.id);sheet('Photo de la vitrine',`<img class="photo-big" src="${f.url}" alt=""><div class="panel"><div class="small">${esc(f.cat||'')}</div><div class="btns">${f.clientId?`<button class="btn ghost" data-act="vit-unpub" data-id="${f.id}">Retirer de la vitrine</button>`:''}<button class="btn danger" data-act="vit-del" data-id="${f.id}">Supprimer</button></div></div>`)},
+  'vit-unpub':async e=>{await filesPatch([e.dataset.id],{public:false,expire:addDays(KEEP)});closeSheet();render();toast('Retirée de la vitrine')},
+  'vit-del':async e=>{if(delArm!==e.dataset.id){delArm=e.dataset.id;e.textContent='Touchez encore pour supprimer';return}await filesRemove([e.dataset.id]);closeSheet();render()},
+  'new-svc':()=>svcForm(),
+  svc:e=>svcForm(S.services.find(s=>s.id===e.dataset.id)),
+  'save-svc':e=>{const nom=val('sv-nom');if(!nom)return toast('Écrivez le service');const d={nom,prix:num(val('sv-prix')),desc:val('sv-desc')};if(e.dataset.id)Object.assign(S.services.find(s=>s.id===e.dataset.id),d);else S.services.push({id:uid(),...d});save();closeSheet();render()},
+  'del-svc':e=>{if(delArm!==e.dataset.id){delArm=e.dataset.id;e.textContent='Touchez encore pour retirer';return}S.services=S.services.filter(s=>s.id!==e.dataset.id);save();closeSheet();render()},
+  'new-ann':()=>annForm(),
+  ann:e=>annSheet(e.dataset.id),
+  'edit-ann':e=>annForm(ann_(e.dataset.id)),
+  'save-ann':async e=>{const t=val('an-t');if(!t)return toast('Écrivez le titre');let ph=annImg;if(ONLINE&&ph&&ph.startsWith('data:')){e.disabled=true;e.textContent='Envoi de l’image…';ph=await upPhoto(ph,USER.id)}
+    const d={titre:t,event:val('an-ev'),texte:val('an-x'),date:val('an-d')||addDays(7),limite:val('an-l'),prix:num(val('an-p')),places:num(val('an-pl')),photo:ph||'',actif:$('#an-on').checked};
+    let a;if(e.dataset.id){a=ann_(e.dataset.id);Object.assign(a,d)}else{a={id:uid(),...d};S.annonces.push(a)}save();closeSheet();view='annonces';render();annSheet(a.id);toast('Annonce enregistrée : partagez-la !')},
+  'del-ann':e=>{if(delArm!==e.dataset.id){delArm=e.dataset.id;e.textContent='Touchez encore pour supprimer';return}S.annonces=S.annonces.filter(a=>a.id!==e.dataset.id);save();closeSheet();render()},
+  'ann-ses':e=>{const a=ann_(e.dataset.id);sesForm(null,{event:a.event,date:a.date,prix:a.prix,annonceId:a.id})},
+  'ca-shift':e=>{const n=shift(caDay||today(),+e.dataset.v);if(n>today())return;caDay=n;render()},
+  dem:e=>demSheet(e.dataset.id),
+  'dem-reply':e=>{const d=S.demandes.find(x=>x.id===e.dataset.id);d.reponse=val('dm-rep');if(!d.reponse)return toast('Écrivez la réponse');d.statut='traite';demSave(d);save();closeSheet();render();toast('Réponse enregistrée')},
+  'dem-wa':e=>{const d=S.demandes.find(x=>x.id===e.dataset.id);const cl=dCl(d);window.open(waLink(cl.tel,('Bonjour '+cl.nom+', '+val('dm-rep')).trim()),'_blank','noopener')},
+  'dem-ses':e=>{const d=S.demandes.find(x=>x.id===e.dataset.id);const x=d.data||{};const a=x.annonceId&&ann_(x.annonceId);const sv=x.serviceId&&S.services.find(s=>s.id===x.serviceId);
+    sesForm(null,{clientId:ensureClient(d),event:x.event||'Mariage',date:x.date||addDays(7),heure:x.heure||'',lieu:x.lieu||'',prix:a?a.prix:sv?sv.prix:'',note:d.texte||'',annonceId:x.annonceId||'',demId:d.id})},
+  'p-noop':()=>{},
+  'c-cat':e=>{cCat=e.dataset.v;render()},
+  'c-photo':e=>{const pub=FILES.filter(f=>f.public&&(!cCat||f.cat===cCat));const f=FILES.find(x=>x.id===e.dataset.id);lightbox(pub,pub.indexOf(f),false)},
+  'c-view':e=>{const list=filesOf(e.dataset.id);lightbox(list,+e.dataset.v,true)},
+  'c-lot':async e=>{const s=ses_(e.dataset.id);const a=+e.dataset.v;const list=filesOf(s.id).slice(a,a+20);
+    if(PREP&&PREP.key===s.id+':'+a){const files=PREP.files;PREP=null;await shareOrDownload(files);e.textContent=tr('Enregistré ✓');return}
+    e.disabled=true;const lab=e.textContent;const files=await fetchFiles(list,(d,n)=>{e.textContent=tr('Préparation')+' '+d+' / '+n+'…'});e.disabled=false;
+    if(!files.length){e.textContent=lab;return toast('Pas de connexion internet : réessayez')}
+    PREP={key:s.id+':'+a,files};e.textContent=tr('Touchez pour enregistrer les')+' '+files.length+' photos';e.classList.add('gold');e.classList.remove('ghost')},
+  'c-aut':async e=>{const c=me();const ok=e.checked;c.autorise=ok;if(PORTAL){await sendAut(ok)}else save();toast(ok?'Merci ! Le photographe est prévenu':'C’est noté')},
+  'c-ann':e=>cResa(e.dataset.id),
+  'c-resa':()=>cResa(),
+  'c-question':()=>cQuestion(),
+  'cr-send':e=>{const a=e.dataset.id&&ann_(e.dataset.id);let data;
+    if(a)data={event:a.event,date:a.date,heure:'',lieu:val('cr-l'),annonceId:a.id};
+    else{const sv=S.services.find(x=>x.id===val('cr-sv'));data={event:val('cr-ev'),date:val('cr-d'),heure:val('cr-h'),lieu:val('cr-l'),serviceId:sv?sv.id:'',serviceNom:sv?sv.nom:''};if(!data.date)return toast('Choisissez la date')}
+    clientSend({id:uid(),type:'resa',texte:val('cr-t'),data,date:today(),statut:'nouveau',reponse:''},e)},
+  'cq-send':e=>{const t=val('cm-t');if(!t)return toast('Écrivez votre question');clientSend({id:uid(),type:'question',texte:t,data:{},date:today(),statut:'nouveau',reponse:''},e)},
+  'lb-close':()=>{LB=null;drawLB()},
+  'lb-prev':()=>{if(LB.i>0){LB.i--;drawLB()}},
+  'lb-next':()=>{if(LB.i<LB.list.length-1){LB.i++;drawLB()}},
+  'lb-save':async e=>{e.disabled=true;e.textContent='…';const fs=await fetchFiles([LB.list[LB.i]]);e.disabled=false;e.textContent=tr('Enregistrer');if(!fs.length)return toast('Pas de connexion internet : réessayez');
+    if(navigator.canShare&&navigator.canShare({files:fs})){try{await navigator.share({files:fs})}catch(err){}}else shareOrDownload(fs)},
+};
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act]');if(!t)return;
+  if(t.dataset.act==='close-bg'){if(e.target===t)closeSheet();return}
+  if(t.type==='checkbox'){const f=A[t.dataset.act];if(f)f(t);return}
+  if(ONLINE&&!PORTAL&&blockedAct(t.dataset.act))return;
+  const f=A[t.dataset.act];if(f){if(t.tagName!=='A'&&t.tagName!=='LABEL')e.preventDefault();f(t)}
+});
+document.addEventListener('input',e=>{
+  if(e.target.dataset.input==='q'){q=e.target.value;const pos=e.target.selectionStart;render();const n=$('#q');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}}
+});
+document.addEventListener('change',async e=>{const t=e.target;
+  if(t.dataset.input==='viewAs'){viewAs=t.value;render()}
+  if(t.dataset.newc){const b=document.getElementById(t.dataset.newc+'-new');if(b)b.hidden=t.value!=='__new'}
+  if(t.dataset.up){const sid=t.dataset.up;const s=ses_(sid);if(ONLINE&&!PORTAL&&blockedAct('up'))return;const files=[...t.files];t.value='';
+    const n=await addPhotos(files,{clientId:s.clientId,seanceId:sid,cat:s.event},upProgress);if(s.statut==='prevu'&&n){s.statut='fait';save()}render();sesSheet(sid);if(n)toast(n+' photos ajoutées')}
+  if(t.dataset.vit){const files=[...t.files];t.value='';const cat=val('va-cat');const n=await addPhotos(files,{pub:true,cat},upProgress);closeSheet();vitCat='';render();if(n)toast(n+' photos dans la vitrine')}
+  if(t.dataset.annimg){const f=t.files[0];if(!f)return;const p=await prepPhoto(f);annImg=await blobToData(p.full);
+    const img=t.closest('.f').querySelector('img');if(img)img.src=annImg;else t.closest('label').insertAdjacentHTML('beforebegin',`<img src="${annImg}" alt="" style="width:100%;border-radius:12px;aspect-ratio:16/9;object-fit:cover">`)}
+});
+document.addEventListener('keydown',e=>{if(!LB)return;if(e.key==='Escape'){LB=null;drawLB()}if(e.key==='ArrowLeft'&&LB.i>0){LB.i--;drawLB()}if(e.key==='ArrowRight'&&LB.i<LB.list.length-1){LB.i++;drawLB()}});
+/* ================= Langue : français + Wolof ================= */
+let LANG=(()=>{try{return localStorage.getItem('studioPhoto.lang')==='wo'?'wo':'fr'}catch(e){return 'fr'}})();
+const WO={
+"Accueil":"Kër","Séances":"Nataal yi","Clients":"Kiliyaan yi","Vitrine":"Vitrine","Caisse":"Kees","Le studio":"Studio bi","Réserver":"Réserver","Mes photos":"Samay nataal","Messages":"Bataaxal yi","Réglages":"Réglages",
+"Séances à venir":"Nataal yu ñëwagul","Photos à livrer":"Nataal yu war a yónnee","Encaissé ce mois":"Xaalis bu dugg weer wii","+ Séance":"+ Nataal","Envoyer des photos":"Yónnee nataal","À traiter":"Lu war a def","Tout voir":"Xool lépp",
+"Prochaines séances":"Nataal yi ci kanam","Aucune séance prévue.":"Amul nataal bu ñu waajal.","Photos en ligne":"Nataal yi ci internet","Annonce en cours":"Yéenekaay bi","Aujourd’hui":"Tey","Demain":"Suba","Hier":"Démb",
+"Prévue":"Waajal nañu ko","Faite":"Def nañu ko","Photos livrées":"Yónnee nañu nataal yi","Annulée":"Neenal nañu ko","À venir":"Ñëwagul","À livrer":"War a yónnee","Livrées":"Yónnee nañu","Toutes":"Lépp","+ Nouvelle":"+ Bu bees","+ Nouveau":"+ Bu bees","+ Ajouter":"+ Yokk","+ Photos":"+ Nataal",
+"Aucune séance ici.":"Amul nataal fii.","Client, événement, lieu…":"Kiliyaan, xew, bérab…","Nom ou téléphone…":"Tur walla telefon…","Aucun client.":"Amul kiliyaan.",
+"Annonces d’événements (Magal, Tabaski…)":"Yéenekaay (Magal, Tabaski…)","Annonces d’événements":"Yéenekaay yi","Annonces":"Yéenekaay yi","+ Nouvelle annonce":"+ Yéenekaay bu bees",
+"Vos plus belles photos, sur votre page. Celles de vos clients seulement s’ils ont dit oui.":"Say nataal yu gën a rafet, ci sa page. Yu sa kiliyaan yi, su ñu nangoo rekk.","Ajoutez vos plus belles photos.":"Yokkal say nataal yu gën a rafet.",
+"Choisir dans les photos des clients qui ont dit oui":"Tànn ci nataalu kiliyaan yi nangoo","Services et prix":"Liggéey yi ak njëg yi","Ajoutez vos formules : mariage, baptême, studio…":"Yokkal say liggéey : séy, ngénte, studio…","Partager ma page":"Séddoo sama page",
+"Total encaissé":"Xaalis bi dugg","Rien encaissé ce jour.":"Duggul dara bés boobu.","Ce mois":"Weer wii","Encaissé":"Dugg na","Reste à encaisser (toutes les séances)":"Li des ci xaalis bi","Espèces":"Cash",
+"Demandes des clients":"Laaj yu kiliyaan yi","Rien pour le moment.":"Amul dara léegi.","Réservation":"Réservation","Question":"Laaj","Autorisation":"Ndigal","Nouveau":"Bees","Traité":"Def nañu ko",
+"Nos photos":"Sunuy nataal","Nos prix":"Sunuy njëg","Réserver une séance":"Réserver nataal","Écrire sur WhatsApp":"Bind ci WhatsApp","Poser une question":"Laaj","Mariage, baptême, studio…":"Séy, ngénte, studio…","Prix, vidéo, délais…":"Njëg, wideo, diir…",
+"Pas encore de séance.":"Amagul nataal.","Écrire au photographe":"Bind photographe bi","Le photographe prépare vos photos. Vous les verrez ici.":"Photographe bi mu ngi waajal say nataal. Dinga ko gis fii.",
+"Mes messages":"Samay bataaxal","+ Question":"+ Laaj","En attente":"Ñu ngi xaar","Répondu":"Tontu nañu","Aucun message.":"Amul bataaxal.","Une question ?":"Am nga laaj ?",
+"Nouvelle séance":"Nataal bu bees","Modifier la séance":"Soppi nataal bi","Client":"Kiliyaan","— Choisir —":"— Tànnal —","+ Nouveau client":"+ Kiliyaan bu bees","Nom":"Tur","Téléphone":"Telefon","Événement":"Xew","Date":"Bés","Heure":"Waxtu","Lieu":"Bérab","Prix (F)":"Njëg (F)","Avance reçue":"Avance","Avance payée par":"Avance bi, fey ak","Annonce":"Yéenekaay","— Aucune —":"— Dara —","Note":"Note","Enregistrer":"Denc",
+"Étape (touchez)":"Fan la tollu (bësal)","Ajouter le paiement":"Yokk pey bi","Paiement":"Pey","Par":"Ak","Choisir":"Tànn","Terminer":"Jeexal","Mettre en vitrine":"Def ko ci vitrine","Supprimer":"Far","+ Ajouter des photos":"+ Yokk nataal",
+"Livrer les photos au client":"Yónnee nataal yi kiliyaan bi","Renvoyer le lien":"Yónneeat lien bi","Rappel":"Fàttali","Modifier":"Soppi","Fiche client":"Kayitu kiliyaan","Annuler la séance":"Neenal nataal bi",
+"Nouveau client":"Kiliyaan bu bees","Modifier le client":"Soppi kiliyaan bi","Téléphone (WhatsApp)":"Telefon (WhatsApp)","Espace client":"Bérabu kiliyaan","Envoyer l’accès":"Yónnee ko dugg bi","Nouveau code":"Code bu bees","Aucune photo en ligne.":"Amul nataal ci internet.",
+"Le client autorise la publication (vitrine, réseaux)":"Kiliyaan bi nangu na ñu wone nataalam","Supprimer le client et ses photos":"Far kiliyaan bi ak nataalam yi",
+"Photos pour la vitrine":"Nataal ngir vitrine bi","Catégorie":"Xeet","Choisir les photos":"Tànn nataal yi","Ces photos restent sur votre page (elles ne s’effacent pas).":"Nataal yii dinañu des ci sa page.",
+"Nouvelle annonce":"Yéenekaay bu bees","Modifier l’annonce":"Soppi yéenekaay bi","Titre":"Tur","Message":"Bataaxal","Date de l’événement":"Bésu xew wi","Réserver avant le":"Réserver balaa","Nombre de places":"Lim bérab yi","sans limite":"amul dayo","Image (facultatif)":"Nataal (bu la neexee)","Ajouter une image":"Yokk nataal","Changer l’image":"Soppi nataal bi","Afficher sur ma page":"Wone ko ci sama page","Supprimer l’annonce":"Far yéenekaay bi",
+"Partager sur WhatsApp (statut, groupes)":"Séddoo ci WhatsApp (statut, groupe)","Réservations":"Réservations yi","À confirmer":"Lu war a dëggal","Confirmées":"Dëggal nañu","+ Séance pour cette annonce":"+ Nataal ngir yéenekaay bii",
+"Confirmer : créer la séance":"Dëggal : def nataal bi","Répondre":"Tontu","Réglages du studio":"Réglagesu studio bi","Nom du studio":"Turu studio bi","Téléphone WhatsApp":"Telefon WhatsApp","Ville":"Dëkk","Adresse":"Adresse","Présentation (sur votre page)":"Leeral (ci sa page)",
+"Formule":"Formule","— Je ne sais pas encore —":"— Xamaguma —","Message (facultatif)":"Bataaxal (bu la neexee)","Envoyer la réservation":"Yónnee réservation bi","Votre question":"Sa laaj","Envoyer":"Yónnee","Votre nom":"Sa tur","Votre numéro WhatsApp":"Sa nimero WhatsApp",
+"Réservation envoyée":"Yónnee nañu réservation bi","Question envoyée":"Yónnee nañu laaj bi","Écrire aussi sur WhatsApp":"Bind it ci WhatsApp","Fermer":"Tëj","× Fermer":"× Tëj","Enregistrer":"Denc","‹ Avant":"‹ Ginnaaw","Après ›":"Kanam ›",
+"Voir mes photos":"Xool samay nataal","Pas encore de code ?":"Amaguloo code ?","Le photographe vous l’envoie sur WhatsApp. Pour réserver, pas besoin de code.":"Photographe bi dina la ko yónnee ci WhatsApp. Ngir réserver, soxlaoo code.",
+"Créer mon studio":"Sos sama studio","Écrivez le nom de votre studio":"Bindal turu sa studio","Lien de votre studio":"Lienu sa studio","Ce studio est introuvable. Vérifiez le lien.":"Gisuñu studio bii. Seetal lien bi.","Page fermée pour le moment":"Page bi tëju na léegi","WhatsApp du photographe":"WhatsApp photographe bi",
+"Gardez le studio sur votre téléphone":"Denc studio bi ci sa telefon","Commencer à vide":"Tàmbali ci dara","Studio":"Studio","Envoyé au photographe":"Yónnee nañu ko photographe bi","Préparation":"Mangi waajal","Enregistré ✓":"Denc nañu ko ✓","Touchez pour enregistrer les":"Bësal ngir denc","Réservations fermées.":"Réservations yi tëju nañu.","Complet":"Fees na","Visiteur sans code":"Gan bu amul code",
+"Écrivez votre nom":"Bindal sa tur","Écrivez votre numéro WhatsApp":"Bindal sa nimero WhatsApp","Choisissez la date":"Tànnal bés bi","Écrivez votre question":"Bindal sa laaj","Choisissez des photos":"Tànnal ay nataal","Séance enregistrée":"Denc nañu nataal bi","Paiement ajouté":"Yokk nañu pey bi","Tout est payé":"Fey nañu lépp",
+"Mon espace client":"Sama bérab kiliyaan","Entrer":"Dugg","Code":"Code","4 chiffres":"4 siifar","Pas encore de code ?":"Amagoo code ?","Se déconnecter":"Génn","Numéro ou code incorrect":"Nimero bi walla code bi baaxul","Bienvenue":"Dalal ak jàmm",
+"Écrivez votre numéro et votre code":"Bindal sa nimero ak sa code","Écrivez votre nom":"Bindal sa tur","Écrivez votre numéro WhatsApp":"Bindal sa nimero WhatsApp","Écrivez votre question":"Bindal sa laaj",
+"Lien de votre salon":"Lienu sa studio","Copier le lien":"Copie lien bi","Partager":"Séddoo","Lien copié":"Copie nañu lien bi","Abonnement":"Abonnement","Voir":"Xool","Compte":"Kont",
+"Abonnement expiré":"Abonnement bi jeex na","Essai gratuit":"Jéem (amul pey)","Abonné":"Abonné","par mois":"ci weer","J’ai payé : vérifier mon abonnement":"Fey naa : seet sama abonnement","Abonnement à jour":"Sa abonnement baax na","Pas encore de paiement reçu":"Jotaguñu pey bi","Vérification…":"Mangi seet…",
+"Abonnement terminé : vous pouvez regarder, pas modifier":"Abonnement bi jeex na : mën ngaa xool, waaye doo mën a soppi",
+"Se connecter":"Dugg","Créer un compte":"Sos kont","Créer mon salon":"Sos sama salon","Numéro de téléphone":"Nimero telefon","Mot de passe":"Baatu jàll","Répéter le mot de passe":"Bindaat baatu jàll bi","6 caractères minimum":"6 araf lu néew",
+"Notez bien votre mot de passe : il faudra le même sur un nouveau téléphone.":"Bindal bu baax sa baatu jàll : dinga ko soxla ci telefon bu bees.","7 jours gratuits.":"7 fan yu amul pey.",
+"Numéro ou mot de passe faux":"Nimero bi walla baatu jàll bi baaxul","Ce numéro a déjà un compte : appuyez sur « Se connecter »":"Nimero bii am na kont ba noppi : bësal « Dugg »","Les deux mots de passe ne sont pas pareils":"Ñaari baatu jàll yi yemuñu",
+"Le mot de passe doit avoir au moins 6 caractères":"Baatu jàll bi war na am 6 araf lu néew","Numéro de téléphone invalide":"Nimero bi baaxul","Pas de connexion internet : réessayez":"Amul internet : jéemaatal","Connexion…":"Mangi dugg…","Chargement…":"Mangi yebbi…","Envoi…":"Mangi yónnee…","Réessayer":"Jéemaatal",
+"Sauvegardé en ligne":"Denc nañu ko ci internet","Envoi en cours…":"Mangi yónnee…","Pas encore envoyé : vérifiez internet":"Yónneegul : seetal internet","Changer le mot de passe":"Soppi baatu jàll","Nouveau mot de passe":"Baatu jàll bu bees","Mot de passe changé":"Soppi nañu baatu jàll bi","Touchez encore pour sortir":"Bësaatal ngir génn",
+"Écrivez le nom de votre salon":"Bindal turu sa studio","Bienvenue ! 7 jours gratuits":"Dalal ak jàmm ! 7 fan yu amul pey","Ce salon est introuvable. Vérifiez le lien.":"Gisuñu studio bii. Seetal lien bi.",
+"Ce sont des exemples pour découvrir l'app.":"Misaal yu ngir xam app bi.","Commencer à vide":"Tàmbali ci dara","Mettez l’app sur l’écran d’accueil":"Def app bi ci écran d'accueil bi","Gardez le salon sur votre téléphone":"Denc studio bi ci sa telefon","C’est fait":"Def naa ko"
+};const WO_RX=[
+[/^Bonjour,? (.+)$/,"Nanga def $1"],[/^Bonsoir, (.+)$/,"Nanga def $1"],[/^Connecté : (.+)$/,"Dugg nga : $1"],[/^Reçu le (.+)$/,"Jot nañu ko ci $1"],[/^Nouveau code : (.+)$/,"Code bu bees : $1"],[/^Jusqu’au (.+)$/,"Ba $1"],[/^Merci (.+) !$/,"Jërëjëf $1 !"],
+[/^(\d+) photos?$/,"$1 nataal"],[/^(\d+) séances?$/,"$1 nataal"],[/^(\d+) réservations?$/,"$1 réservation"],[/^Plus que (\d+) places$/,"$1 bérab rekk a des"],[/^(.+) dans (\d+) jours$/,"$1 ci $2 fan"],[/^C’est aujourd’hui$/,"Tey la"],[/^C’est demain$/,"Suba la"],
+[/^Vos (\d+) photos sont prêtes !$/,"Say $1 nataal pare nañu !"],[/^Enregistrer les (\d+) photos sur mon téléphone$/,"Denc $1 nataal yi ci sama telefon"],[/^Enregistrer les photos (\d+) à (\d+)$/,"Denc nataal $1 ba $2"],[/^Photos · (\d+)$/,"Nataal · $1"],[/^Photos en ligne · (\d+)$/,"Nataal ci internet · $1"],
+[/^Je réserve pour (.+)$/,"Réserver naa ngir $1"],[/^Réserver · (.+)$/,"Réserver · $1"],[/^Prolonger de (\d+) jours$/,"Yokk $1 fan"],[/^Envoi (\d+) \/ (\d+)…$/,"Mangi yónnee $1 / $2…"]
+];function trWo(s){if(Object.prototype.hasOwnProperty.call(WO,s))return WO[s];for(const [r,v] of WO_RX)if(r.test(s))return s.replace(r,v);return s}
+const tr=s=>LANG==='wo'?trWo(s):s;
+const SKIP='script,style,textarea,.aname,.eyebrow,.row-t,.card-t,.code,.linkbox,[data-notr]';
+function trNode(n){if(LANG!=='wo'||!n)return;
+  if(n.nodeType===3){const p=n.parentElement;if(!p||p.closest(SKIP))return;const v=n.nodeValue,t=v.trim();if(!t||!/[A-Za-zÀ-ÿ]/.test(t))return;const r=trWo(t);if(r!==t)n.nodeValue=v.replace(t,r);return}
+  if(n.nodeType!==1||n.closest(SKIP))return;
+  const ph=el=>{const t=(el.getAttribute('placeholder')||'').trim();if(t){const r=trWo(t);if(r!==t)el.setAttribute('placeholder',r)}};
+  if(n.hasAttribute('placeholder'))ph(n);
+  const tw=document.createTreeWalker(n,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT);let c;
+  while((c=tw.nextNode())){if(c.nodeType===3)trNode(c);else if(c.hasAttribute('placeholder')&&!c.closest(SKIP))ph(c)}}
+new MutationObserver(ms=>{if(LANG!=='wo')return;for(const m of ms){if(m.type==='characterData'||m.type==='attributes')trNode(m.target);else m.addedNodes.forEach(trNode)}})
+  .observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['placeholder']});
+function applyLang(){document.documentElement.lang=LANG==='wo'?'wo':'fr';if(LANG==='wo')trNode(document.body)}
+A.lang=()=>{LANG=LANG==='wo'?'fr':'wo';try{localStorage.setItem('studioPhoto.lang',LANG)}catch(e){}closeSheet();render();applyLang();toast(LANG==='wo'?'Wolof':'Français')};
+
+/* ================= EN LIGNE (Supabase seck.apps.sn) ================= */
+const ONLINE=!!window.SP_ONLINE;
+const SUPA_URL='https://ncsjgmkrsvtwklfrdbgy.supabase.co',SUPA_KEY='sb_publishable_oDE4BbU6J3RTnce1Oo91cQ_hokWgh0U';
+const MAIL_DOM='@studiophoto.app',SITE='https://seckappssn-maker.github.io/studio-photo/',BUCKET='photo';
+const GRACE_DAYS=3,SECK_WA='77 879 00 06',SECK_PAY='77 879 00 06';
+const QS=(()=>{try{return new URLSearchParams(location.search)}catch(e){return new URLSearchParams('')}})();
+const PORTAL=ONLINE?(QS.get('a')||'').trim():'';
+const LKEY='studioPhoto.v1',PKEY='studioPhoto.portal.'+PORTAL,DIRTY=LKEY+'.dirty';
+let SB=null,USER=null,BOOT=ONLINE,AUTHM='login',LIC=null,syncSt='ok',pushT=null,retryT=null,pushing=false,PUB=null,PCRED=null,PERR='',outArm=false;
+
+const newCode=()=>String(1000+Math.floor(Math.random()*9000));
+const A31='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+function newShopId(){const a=new Uint32Array(6);try{crypto.getRandomValues(a)}catch(e){a.forEach((_,i)=>a[i]=Math.random()*1e9)}return Array.from(a,x=>A31[x%31]).join('')}
+function phoneDigits(p){let d=String(p||'').replace(/\D/g,'');if(d.startsWith('00'))d=d.slice(2);if(d.length===9)d='221'+d;return d}
+const userPhone=()=>USER&&USER.email?USER.email.split('@')[0].replace(/^221(\d\d)(\d{3})(\d\d)(\d\d)$/,'$1 $2 $3 $4'):'';
+const portalLink=()=>SITE+'?a='+(ONLINE&&S&&S.shopId?S.shopId:'VOTRECODE');
+function accessMsg(c){return `Bonjour ${c.nom}, voici votre espace photos ${S.shop.nom} :\n${portalLink()}\n\nNuméro : ${c.tel}\nCode : ${c.code}\n\nVous y verrez vos photos dès qu’elles sont prêtes, et vous les enregistrez sur votre téléphone.`}
+const isDirty=()=>{try{return localStorage.getItem(DIRTY)==='1'}catch(e){return false}};
+const setDirty=v=>{try{v?localStorage.setItem(DIRTY,'1'):localStorage.removeItem(DIRTY)}catch(e){}};
+const errTxt=e=>{const m=String(e&&e.message||e||'');return /fetch|network|Failed|Load failed/i.test(m)?'Pas de connexion internet : réessayez':m};
+
+function newState(nom,ville,tel){return fixState({v:1,demo:false,shopId:newShopId(),shop:{nom:nom||'Mon studio',tel:tel||'',ville:ville||'',adresse:'',insta:'',tiktok:'',apropos:'',bloquer:true},services:[],annonces:[],clients:[],seances:[],demandes:[]})}
+function fixOnline(o){o=fixState(o);if(o&&!o.shopId)o.shopId=newShopId();if(o)delete o.files;return o}
+const blob=()=>{const o={...S};delete o.demandes;delete o.files;return o};
+function writeLocal(){try{localStorage.setItem(LKEY,JSON.stringify(blob()))}catch(e){}}
+function loadLocal(){try{const r=localStorage.getItem(LKEY);if(r)return fixOnline(JSON.parse(r))}catch(e){}return null}
+function saveOnline(){if(PORTAL)return;S.savedAt=Date.now();if(USER)S.uid=USER.id;writeLocal();setDirty(true);schedulePush()}
+function setSync(st){syncSt=st;const e=document.getElementById('syncDot');if(e){e.textContent=st==='ok'?'☁ ✓':st==='err'?'☁ !':'☁ …';e.className='sync '+st}}
+function schedulePush(){if(!SB||!USER)return;clearTimeout(pushT);setSync('wait');pushT=setTimeout(push,1200)}
+async function push(){if(!SB||!USER||!S||pushing)return;if(!isDirty()){setSync('ok');return}pushing=true;const at=S.savedAt||0;
+  try{const {error}=await SB.from('photo_comptes').upsert({user_id:USER.id,phone:USER.email.split('@')[0],shop_name:S.shop.nom||'',shop_id:S.shopId,saved_at:at,data:blob(),updated_at:new Date().toISOString()});
+    if(error){if(/shop_id/i.test(error.message||'')){S.shopId=newShopId();writeLocal()}throw error}
+    if((S.savedAt||0)===at)setDirty(false);setSync('ok')}
+  catch(e){setSync('err');clearTimeout(retryT);retryT=setTimeout(push,20000)}
+  finally{pushing=false;if(isDirty()&&syncSt==='ok')schedulePush()}}
+async function cloudCheck(){
+  const r=await SB.from('photo_comptes').select('saved_at').eq('user_id',USER.id).maybeSingle();if(r.error)throw r.error;
+  if(!r.data){if(S){S.uid=USER.id;setDirty(true);await push()}return 'empty'}
+  const cAt=Number(r.data.saved_at)||0,lAt=(S&&S.savedAt)||0;
+  if(!S||S.uid!==USER.id||cAt>lAt){const d=await SB.from('photo_comptes').select('data').eq('user_id',USER.id).single();if(d.error)throw d.error;
+    const dem=S&&S.uid===USER.id?S.demandes:[];S=fixOnline(d.data.data);S.uid=USER.id;S.demandes=dem||[];writeLocal();setDirty(false);setSync('ok');return 'down'}
+  if(lAt>cAt){setDirty(true);await push();return 'up'}
+  setDirty(false);setSync('ok');return 'same'}
+const rowDem=r=>({id:r.id,clientId:r.client_id||null,type:r.type,texte:r.texte||'',data:r.data||{},date:String(r.created_at||'').slice(0,10)||today(),statut:r.statut||'nouveau',reponse:r.reponse||'',nomV:r.client_nom||'',telV:r.client_phone||''});
+async function loadDem(){if(!SB||!USER||!S)return false;const r=await SB.from('photo_demandes').select('*').eq('owner_id',USER.id).order('created_at',{ascending:false}).limit(300);if(r.error)return false;
+  const before=JSON.stringify(S.demandes.map(d=>d.id+d.statut));S.demandes=(r.data||[]).map(rowDem);
+  /* autorisations envoyées par les clients : appliquées tout de suite */
+  const aut=S.demandes.filter(d=>d.type==='autorise'&&d.statut==='nouveau').reverse();let ch=false;
+  for(const d of aut){const c=client(d.clientId);if(c){c.autorise=!!(d.data&&d.data.ok);ch=true}d.statut='traite';demSave(d)}
+  if(ch)save();
+  return ch||before!==JSON.stringify(S.demandes.map(d=>d.id+d.statut))}
+function demSave(d){if(!ONLINE||PORTAL||!SB||!USER)return;SB.from('photo_demandes').update({statut:d.statut,reponse:d.reponse||''}).eq('id',d.id).then(r=>{if(r.error)toast('Réponse pas envoyée : vérifiez internet')})}
+async function fetchLic(){if(!SB||!USER)return;const r=await SB.rpc('photo_inscription');if(!r.error&&r.data&&r.data[0]){LIC=r.data[0];try{localStorage.setItem(LKEY+'.lic',JSON.stringify(LIC))}catch(e){}}}
+function licState(){const L=LIC||{};const end=[L.trial_end,L.paid_until].filter(Boolean).sort().pop()||today();const left=daysTo(end);const trial=!L.paid_until||L.trial_end>=L.paid_until;
+  if(left>=0)return{st:left<=5?'warn':'ok',left,end,trial};if(-left<=GRACE_DAYS)return{st:'grace',left,end,trial};return{st:'blocked',left,end,trial}}
+const WRITE=new Set(['up','up-pick','new-ses','new-ses-for','edit-ses','save-ses','ses-st','ses-livrer','ses-pay','del-ses','sel-del','sel-pub','new-client','edit-client','save-client','new-code','cl-aut','prolong','del-client','vit-add','vit-pick','pick-save','vit-unpub','vit-del','new-svc','save-svc','del-svc','new-ann','edit-ann','save-ann','del-ann','ann-ses','dem-reply','dem-ses','save-settings']);
+function blockedAct(a){if(!LIC||!WRITE.has(a)||licState().st!=='blocked')return false;toast(tr('Abonnement terminé : vous pouvez regarder, pas modifier'));aboSheet();return true}
+
+/* ---------- fichiers (table photo_fichiers + dossier « photo ») ---------- */
+const rowFile=r=>({id:r.id,clientId:r.client_id||null,seanceId:r.seance_id||null,url:r.url,thumb:r.thumb||r.url,path:r.path,thumbPath:r.thumb_path,size:r.size||0,cat:r.cat||'',public:!!r.public,expire:r.expire_at||null,created:String(r.created_at||'').slice(0,10)});
+async function loadFiles(){if(!SB||!USER)return;const all=[];for(let from=0;from<20000;from+=1000){const r=await SB.from('photo_fichiers').select('*').eq('owner_id',USER.id).order('created_at',{ascending:false}).range(from,from+999);if(r.error)throw r.error;all.push(...(r.data||[]));if(!r.data||r.data.length<1000)break}
+  FILES=all.map(rowFile)}
+async function upBlob(path,b){const r=await SB.storage.from(BUCKET).upload(path,b,{contentType:'image/jpeg',upsert:false});if(r.error)throw r.error;return SB.storage.from(BUCKET).getPublicUrl(path).data.publicUrl}
+async function fileUpload(p,rec){const base=USER.id+'/'+(rec.clientId||'vitrine')+'/'+Date.now().toString(36)+uid();
+  for(let k=0;k<2;k++){try{const url=await upBlob(base+'.jpg',p.full);const thumb=await upBlob(base+'_t.jpg',p.thumb);
+      const r=await SB.from('photo_fichiers').insert({owner_id:USER.id,shop_id:S.shopId,client_id:rec.clientId,seance_id:rec.seanceId,path:base+'.jpg',thumb_path:base+'_t.jpg',url,thumb,size:rec.size,cat:rec.cat,public:rec.public,expire_at:rec.expire}).select().single();
+      if(r.error)throw r.error;return rowFile(r.data)}catch(e){if(k)return null;await new Promise(r=>setTimeout(r,1500))}}}
+async function fileUpdate(ids,patch){const m={};if('public' in patch)m.public=patch.public;if('expire' in patch)m.expire_at=patch.expire;if('cat' in patch)m.cat=patch.cat;
+  for(let i=0;i<ids.length;i+=200){const r=await SB.from('photo_fichiers').update(m).in('id',ids.slice(i,i+200));if(r.error){toast('Pas enregistré : vérifiez internet');return}}}
+async function fileDelete(list){if(!list.length)return;const paths=list.flatMap(f=>[f.path,f.thumbPath]).filter(Boolean);
+  for(let i=0;i<paths.length;i+=100){try{await SB.storage.from(BUCKET).remove(paths.slice(i,i+100))}catch(e){}}
+  const ids=list.map(f=>f.id);for(let i=0;i<ids.length;i+=200){await SB.from('photo_fichiers').delete().in('id',ids.slice(i,i+200))}}
+function dataToBlob(u){const [h,b]=u.split(',');const bin=atob(b);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:(h.match(/data:([^;]+)/)||[])[1]||'image/jpeg'})}
+async function upPhoto(u,folder){if(!ONLINE||!SB||!u||!/^data:image\/(jpeg|png|webp)/.test(u))return u;
+  try{return await upBlob(folder+'/annonces/'+Date.now().toString(36)+uid()+'.jpg',dataToBlob(u))}catch(e){return ''}}
+
+/* ---------- en-tête ---------- */
+function langBtn(){return `<button class="hbtn" data-act="lang" aria-label="Langue">${LANG==='wo'?'FR':'WO'}</button>`}
+function renderHdr(){const h=document.getElementById('hdrR');if(!h)return;
+  if(!ONLINE){h.innerHTML=`<div style="display:flex;gap:6px;align-items:center">${langBtn()}<div class="mode" role="tablist" aria-label="Mode"><button class="${mode==='studio'?'on':''}" data-act="mode" data-v="studio">Studio</button><button class="${mode==='client'?'on':''}" data-act="mode" data-v="client">Client</button></div></div>`;return}
+  if(PORTAL||!USER||!S){h.innerHTML=langBtn();return}
+  const L=licState();let lab,cls;
+  if(!LIC){lab='☁';cls=''}else if(L.st==='blocked'){lab='Abonnement expiré';cls='bad'}else if(L.st==='grace'){lab='Expiré · '+(GRACE_DAYS+L.left)+' j';cls='bad'}
+  else if(L.st==='warn'){lab=(L.trial?'Essai':'Abonné')+' · '+L.left+' j';cls='warn'}else{lab=L.trial?'Essai gratuit':quota().nom;cls='ok'}
+  h.innerHTML=`<div style="display:flex;gap:6px;align-items:center"><span id="syncDot" class="sync ${syncSt}">${syncSt==='ok'?'☁ ✓':syncSt==='err'?'☁ !':'☁ …'}</span>${langBtn()}<button class="hchip ${cls}" data-act="abo">${lab}</button></div>`}
+
+/* ---------- écrans sans données ---------- */
+function onlineScreen(){
+  const show=html=>{$('#main').innerHTML=html;$('#tabs').innerHTML='';renderHdr();applyLang();return true};
+  if(BOOT)return show('<div class="empty" style="padding-top:30vh">Chargement…</div>');
+  if(PERR&&!S)return show(`<div class="empty" style="padding-top:20vh">${esc(PERR)}</div>`);
+  if(PORTAL){$('#aname').textContent=S.shop.nom;if(PUB&&!PUB.actif)return show(`<div class="panel" style="margin-top:20px"><h2>Page fermée pour le moment</h2><p class="muted" style="margin:0">Écrivez directement au photographe.</p>${S.shop.tel?`<a class="btn wa" href="${waLink(S.shop.tel,'Bonjour '+S.shop.nom+', ')}" target="_blank" rel="noopener">${I.wa} WhatsApp du photographe</a>`:''}</div>`);return false}
+  if(!USER){$('#aname').textContent='Studio Photo';return show(vLogin())}
+  if(!S)return show('<div class="empty" style="padding-top:30vh">Chargement…</div>');
+  return false}
+
+/* ---------- connexion du photographe ---------- */
+function vLogin(){const su=AUTHM==='signup';
+  return `<div class="hello" style="padding-top:6px"><h1>${su?'Créer mon studio':'Se connecter'}</h1><p class="muted" style="margin:0">Vos séances, vos clients, leurs photos et votre caisse, sauvegardés en ligne.${su?' <b>7 jours gratuits.</b>':''}</p></div>
+  <div class="panel"><div class="chips"><button class="chip ${su?'':'on'}" data-act="authm" data-v="login">Se connecter</button><button class="chip ${su?'on':''}" data-act="authm" data-v="signup">Créer un compte</button></div>
+  ${su?`<div class="f"><label for="au-nom">Nom du studio</label><input id="au-nom" placeholder="ex. Sanzo Picture"></div><div class="f"><label for="au-ville">Ville</label><input id="au-ville" placeholder="ex. Dakar"></div>`:''}
+  <div class="f"><label for="au-tel">Numéro de téléphone</label><input id="au-tel" inputmode="tel" autocomplete="username" placeholder="77 000 00 00"></div>
+  <div class="f"><label for="au-pw">Mot de passe</label><input id="au-pw" type="password" autocomplete="${su?'new-password':'current-password'}" placeholder="6 caractères minimum"></div>
+  ${su?'<div class="f"><label for="au-pw2">Répéter le mot de passe</label><input id="au-pw2" type="password" autocomplete="new-password"></div><div class="note">Notez bien votre mot de passe : il faudra le même sur un nouveau téléphone.</div>':''}
+  <button class="btn block" data-act="auth" id="au-btn">${su?'Créer mon studio':'Se connecter'}</button><div class="small bad" id="au-msg" role="status"></div></div>
+  <p class="note" style="text-align:center">Besoin d’aide ? WhatsApp Seck Apps : ${SECK_WA}</p>`}
+async function doAuth(btn){const su=AUTHM==='signup',ph=phoneDigits(val('au-tel')),pw=$('#au-pw').value;const say=t=>{const m=$('#au-msg');if(m)m.textContent=tr(t)};
+  if(ph.length<12)return say('Numéro de téléphone invalide');if(pw.length<6)return say('Le mot de passe doit avoir au moins 6 caractères');
+  if(su&&pw!==$('#au-pw2').value)return say('Les deux mots de passe ne sont pas pareils');
+  const nom=su?val('au-nom'):'',ville=su?val('au-ville'):'';if(su&&!nom)return say('Écrivez le nom de votre studio');
+  btn.disabled=true;btn.textContent=tr('Connexion…');say('');
+  try{const email=ph+MAIL_DOM;const r=su?await SB.auth.signUp({email,password:pw}):await SB.auth.signInWithPassword({email,password:pw});
+    if(r.error)throw r.error;if(!r.data.session){btn.disabled=false;btn.textContent=tr(su?'Créer mon studio':'Se connecter');return say('Compte créé mais pas encore actif. Contactez Seck Apps.')}
+    USER=r.data.session.user;S=loadLocal();if(S&&S.uid!==USER.id)S=null;
+    if(su){S=newState(nom,ville,ph.slice(3).replace(/(\d\d)(\d{3})(\d\d)(\d\d)/,'$1 $2 $3 $4'));S.uid=USER.id;saveOnline()}
+    await afterLogin();if(su){toast(tr('Bienvenue ! 7 jours gratuits'))}}
+  catch(e){const m=String(e&&e.message||'');btn.disabled=false;btn.textContent=tr(su?'Créer mon studio':'Se connecter');
+    say(/already|registered|exists/i.test(m)?'Ce numéro a déjà un compte : appuyez sur « Se connecter »':/invalid login|credentials/i.test(m)?'Numéro ou mot de passe faux':errTxt(e))}}
+async function afterLogin(){try{await cloudCheck()}catch(e){setSync('err')}
+  if(!S){S=newState('Mon studio','',userPhone());S.uid=USER.id;saveOnline()}
+  try{await fetchLic()}catch(e){}try{await loadFiles();cleanupExpired()}catch(e){}try{await loadDem()}catch(e){}view='accueil';mode='studio';render()}
+async function doLogout(){if(isDirty()){await push();if(isDirty())return toast(tr('Pas encore sauvegardé en ligne : connectez-vous à internet avant de sortir'))}
+  try{await SB.auth.signOut()}catch(e){}USER=null;S=null;LIC=null;FILES=[];try{localStorage.removeItem(LKEY);localStorage.removeItem(LKEY+'.lic')}catch(e){}setDirty(false);closeSheet();render()}
+
+/* ---------- réglages en ligne & abonnement ---------- */
+function onlineSettings(){const L=licState();const link=portalLink();
+  const share=`${S.shop.nom} : nos photos, nos prix et les réservations ici :\n${link}`;
+  return `<div class="panel"><h3>Lien de votre studio</h3><div class="small muted">Vos clients y voient vos photos et vos prix, réservent, et récupèrent leurs photos avec leur code. Mettez-le dans votre bio Instagram, TikTok et votre statut WhatsApp.</div><div class="linkbox" id="lnk">${esc(link)}</div>
+  <div class="btns"><button class="btn ghost sm" data-act="copy" data-v="${esc(link)}">Copier le lien</button><a class="btn wa sm" href="https://wa.me/?text=${encodeURIComponent(share)}" target="_blank" rel="noopener">${I.wa} Partager</a></div></div>
+  <div class="panel"><div class="sec-h"><h3>Abonnement</h3><button class="btn sm ghost" data-act="abo">Voir</button></div><div class="small muted">${LIC?(L.trial?'Essai gratuit':'Formule '+quota().nom)+' jusqu’au '+dateFr(L.end,{day:'numeric',month:'long',year:'numeric'}):'—'} · code studio <b>${esc(S.shopId)}</b></div></div>
+  <div class="panel"><h3>Compte</h3><div class="small muted">Connecté : ${esc(userPhone())} · <span id="syncTxt">${syncSt==='ok'?'Sauvegardé en ligne':syncSt==='err'?'Pas encore envoyé : vérifiez internet':'Envoi en cours…'}</span></div>
+  <div class="f"><label for="new-pw">Nouveau mot de passe</label><input id="new-pw" type="password" autocomplete="new-password" placeholder="6 caractères minimum"></div><button class="btn ghost" data-act="chg-pw">Changer le mot de passe</button>
+  <button class="btn danger" data-act="logout">Se déconnecter</button></div>`}
+function aboSheet(){const L=licState();const cur=(LIC&&LIC.formule&&FORM[LIC.formule])?LIC.formule:'';
+  const st=!LIC?'—':L.st==='blocked'?'Abonnement expiré':L.st==='grace'?'Expiré : bloqué dans '+(GRACE_DAYS+L.left)+' j':(L.trial?'Essai gratuit':'Abonné')+' · '+L.left+' j restants';
+  const msg=f=>`Bonjour Seck Apps, je paie l’abonnement Studio Photo, formule ${FORM[f].nom} (${fmt(FORM[f].prix)}).\nStudio : ${S.shop.nom}\nCode : ${S.shopId}\nNuméro : ${userPhone()}`;
+  sheet('Abonnement',`<div class="panel"><div class="sec-h"><b>${st}</b></div><div class="small muted">Jusqu’au ${dateFr(L.end,{day:'numeric',month:'long',year:'numeric'})}</div></div>
+  ${Object.keys(FORM).map(k=>{const F=FORM[k];return `<div class="panel" style="${k===cur?'border:2px solid var(--indigo)':''}"><div class="sec-h"><h3>${F.nom}${k===cur?' · votre formule':''}</h3><b>${fmt(F.prix)} / mois</b></div><div class="small">Jusqu’à <b>${F.max.toLocaleString('fr-FR')} photos</b> en ligne en même temps.</div><a class="btn wa sm" href="${waLink(SECK_WA,msg(k))}" target="_blank" rel="noopener">${I.wa} Payer ${F.nom}</a></div>`}).join('')}
+  <div class="panel"><div class="small">1. Envoyez le montant par <b>Wave</b> ou <b>Orange Money</b> au <b>${SECK_PAY}</b>.<br>2. Envoyez la capture sur WhatsApp avec votre code studio <b>${esc(S.shopId)}</b>.<br>3. Appuyez sur « J’ai payé : vérifier ».</div>
+  <button class="btn gold" data-act="abo-check">J’ai payé : vérifier mon abonnement</button>
+  <div class="note">Si l’abonnement n’est pas payé, 3 jours après la fin l’app se bloque : vous voyez vos données mais vous ne pouvez plus modifier, et votre page se ferme. Tout revient dès le paiement.</div></div>`)}
+
+/* ---------- page des clients (lien ?a=) ---------- */
+async function portalBoot(){SB=window.supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:false,autoRefreshToken:false,storageKey:'studioPhoto.portal'}});
+  let r;try{r=await SB.rpc('photo_public',{p_shop:PORTAL})}catch(e){r={error:e}}
+  BOOT=false;
+  if(r.error){PERR=errTxt(r.error);return render()}
+  if(!r.data){PERR='Ce studio est introuvable. Vérifiez le lien.';return render()}
+  PUB=r.data;try{document.title=PUB.nom;const mt=document.querySelector('meta[name="apple-mobile-web-app-title"]');if(mt)mt.setAttribute('content',PUB.nom)}catch(e){}
+  S={v:1,shop:{nom:PUB.nom||'Studio',tel:PUB.tel||'',ville:PUB.ville||'',adresse:PUB.adresse||'',insta:PUB.insta||'',tiktok:PUB.tiktok||'',apropos:PUB.apropos||''},
+     services:PUB.services||[],annonces:(PUB.annonces||[]).map(a=>({...a,actif:true})),clients:[],seances:[],demandes:[]};
+  FILES=(PUB.photos||[]).map(f=>({id:f.id,url:f.url,thumb:f.thumb||f.url,cat:f.cat||'',public:true}));
+  mode='client';view='c-studio';
+  try{PCRED=JSON.parse(localStorage.getItem(PKEY)||'null')}catch(e){}
+  if(PCRED&&await portalLoad(PCRED,true))view='c-accueil';
+  render()}
+async function portalLoad(cred,silent){let r;try{r=await SB.rpc('photo_client',{p_shop:PORTAL,p_phone:cred.tel,p_code:cred.code})}catch(e){r={error:e}}
+  if(r.error){const m=String(r.error.message||'');if(/code incorrect/i.test(m)){PCRED=null;try{localStorage.removeItem(PKEY)}catch(e){}}
+    if(!silent)toast(tr(/code incorrect/i.test(m)?'Numéro ou code incorrect':/inactif/i.test(m)?'Espace fermé pour le moment':'Pas de connexion internet : réessayez'));return false}
+  PCRED=cred;try{localStorage.setItem(PKEY,JSON.stringify(cred))}catch(e){}
+  const d=r.data;S.clients=[{id:d.client.id,nom:d.client.nom||'',tel:d.client.tel||'',autorise:!!d.client.autorise}];viewAs=d.client.id;
+  S.seances=(d.seances||[]).map(x=>({...x,clientId:d.client.id,paiements:[{montant:num(x.paye)}]}));
+  const pub=FILES.filter(f=>f.public&&!f.seanceId);FILES=pub.concat((d.photos||[]).map(f=>({id:f.id,seanceId:f.seance_id,clientId:d.client.id,url:f.url,thumb:f.thumb||f.url,expire:f.expire_at||null,public:false})));
+  S.demandes=(d.demandes||[]).map(rowDem);return true}
+function portalLogin(){return `<div class="hello"><div class="lbl">${esc(S.shop.nom)}</div><h1>Mes photos</h1></div>
+  <div class="panel"><p class="small" style="margin:0">Entrez votre numéro et le <b>code</b> que le photographe vous a envoyé. Vous verrez vos photos et vous les enregistrerez sur votre téléphone.</p>
+  <div class="f"><label for="pl-tel">Numéro de téléphone</label><input id="pl-tel" inputmode="tel" autocomplete="tel" placeholder="77 000 00 00"></div>
+  <div class="f"><label for="pl-code">Code</label><input id="pl-code" inputmode="numeric" maxlength="6" placeholder="4 chiffres"></div>
+  <button class="btn block" data-act="pl-go">Voir mes photos</button></div>
+  <div class="panel"><b>Pas encore de code ?</b><span class="small muted">Le photographe vous l’envoie sur WhatsApp. Pour réserver, pas besoin de code.</span><button class="btn gold" data-act="tab" data-v="c-direct">Réserver une séance</button></div>`}
+function sentSheet(d){const q=d.type==='question';const x=d.data||{};
+  sheet(q?'Question envoyée':'Réservation envoyée',`<div class="panel"><b>Merci ${esc(d.nomV)} !</b><div>${q?'Le photographe a reçu votre question.':'Le photographe a reçu votre réservation'+(x.event?' ('+esc(x.event)+(x.date?', '+esc(dateFr(x.date,{day:'numeric',month:'long'})):'')+')':'')+'.'} Il vous répond sur WhatsApp au ${esc(d.telV)}.</div>${S.shop.tel?`<a class="btn wa" href="${waLink(S.shop.tel,'Bonjour '+S.shop.nom+', je viens de vous envoyer '+(q?'une question':'une réservation : '+demSummary(d))+' sur votre page. Mon nom : '+d.nomV+'.')}" target="_blank" rel="noopener">${I.wa} Écrire aussi sur WhatsApp</a>`:''}<button class="btn ghost" data-act="close">Fermer</button></div>`)}
+async function sendDem(d,btn){
+  if(!PORTAL){S.demandes.push(d);save();closeSheet();if(d.clientId){view='c-messages';render();return toast(tr('Envoyé au photographe'))}render();return sentSheet(d)}
+  if(btn){btn.disabled=true;btn.textContent=tr('Envoi…')}
+  let r;try{r=d.clientId
+    ?await SB.rpc('photo_client_send',{p_shop:PORTAL,p_phone:PCRED.tel,p_code:PCRED.code,p_type:d.type,p_texte:d.texte||'',p_data:d.data||{}})
+    :await SB.rpc('photo_visiteur_send',{p_shop:PORTAL,p_nom:d.nomV,p_phone:d.telV,p_type:d.type,p_texte:d.texte||'',p_data:d.data||{}})}catch(e){r={error:e}}
+  if(r.error){if(btn){btn.disabled=false;btn.textContent=tr('Réessayer')}return toast(errTxt(r.error))}
+  if(d.clientId){await portalLoad(PCRED,true);closeSheet();view='c-messages';render();return toast(tr('Envoyé au photographe'))}
+  closeSheet();sentSheet(d)}
+async function sendAut(ok){try{const r=await SB.rpc('photo_client_send',{p_shop:PORTAL,p_phone:PCRED.tel,p_code:PCRED.code,p_type:'autorise',p_texte:'',p_data:{ok}});if(r.error)toast(errTxt(r.error))}catch(e){toast(tr('Pas de connexion internet : réessayez'))}}
+/* ---------- écran d'accueil du téléphone ---------- */
+const IS_IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const IS_APP=(()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}})();
+function a2hs(){if(!ONLINE||IS_APP)return '';try{if(localStorage.getItem('studioPhoto.a2hs'+PORTAL)==='1')return ''}catch(e){}
+  const steps=IS_IOS?'<span>1. Ouvrez ce lien dans <b>Safari</b>.</span><span>2. Appuyez sur <b>Partager</b> (carré avec une flèche).</span><span>3. Choisissez <b>« Sur l’écran d’accueil »</b>, puis <b>Ajouter</b>.</span>'
+    :'<span>1. Ouvrez ce lien dans <b>Chrome</b>.</span><span>2. Appuyez sur le menu <b>⋮</b> en haut.</span><span>3. Choisissez <b>« Ajouter à l’écran d’accueil »</b>.</span>';
+  return `<div class="panel" style="border:1.5px dashed var(--gold-line)"><b>${PORTAL?'Gardez le studio sur votre téléphone':'Mettez l’app sur l’écran d’accueil'}</b><div class="small" style="display:flex;flex-direction:column;gap:3px">${steps}<span>Ensuite, ouvrez toujours ${PORTAL?'le studio':'l’app'} avec l’icône.</span></div><button class="btn ghost sm" data-act="a2hs-ok" style="align-self:flex-start">C’est fait</button></div>`}
+A['a2hs-ok']=()=>{try{localStorage.setItem('studioPhoto.a2hs'+PORTAL,'1')}catch(e){}render()};
+
+/* ---------- démarrage ---------- */
+async function onlineBoot(){
+  const t0=Date.now();while(!window.supabase&&Date.now()-t0<8000)await new Promise(r=>setTimeout(r,150));
+  if(!window.supabase){BOOT=false;PERR='Pas de connexion internet. Vérifiez et rechargez la page.';S=PORTAL?null:loadLocal();if(S&&!PORTAL){USER={id:S.uid,email:''}}return render()}
+  if(PORTAL)return portalBoot();
+  SB=window.supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'studioPhoto.auth'}});
+  try{const {data}=await SB.auth.getSession();USER=data&&data.session?data.session.user:null}catch(e){USER=null}
+  if(!USER){try{const o=JSON.parse(localStorage.getItem('studioPhoto.auth')||'null');if(o&&o.user&&o.user.id)USER=o.user}catch(e){}}
+  BOOT=false;if(!USER){S=null;return render()}
+  S=loadLocal();if(S&&S.uid&&S.uid!==USER.id)S=null;if(S)S.demandes=[];
+  try{LIC=JSON.parse(localStorage.getItem(LKEY+'.lic')||'null')}catch(e){}
+  if(S)render();
+  await afterLogin();
+  const refresh=async()=>{if(!USER||!SB||upBusy)return;let ch=false;try{if(!isDirty()&&await cloudCheck()==='down')ch=true}catch(e){}try{if(await loadDem())ch=true}catch(e){}try{await fetchLic()}catch(e){}if(ch&&!document.querySelector('.scrim'))render();else renderHdr()};
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh()});
+  setInterval(()=>{if(document.visibilityState==='visible')refresh()},60000);
+  window.addEventListener('online',()=>{if(isDirty())push()})}
+
+Object.assign(A,{
+  authm:e=>{AUTHM=e.dataset.v;render()},
+  auth:e=>doAuth(e),
+  abo:()=>aboSheet(),
+  'abo-check':async e=>{e.disabled=true;e.textContent=tr('Vérification…');try{await fetchLic()}catch(err){}const L=licState();closeSheet();render();toast(tr(L.st==='blocked'?'Pas encore de paiement reçu':'Abonnement à jour'))},
+  copy:e=>{const t=e.dataset.v;try{navigator.clipboard.writeText(t).then(()=>toast(tr('Lien copié')),()=>selLink())}catch(err){selLink()}},
+  'chg-pw':async e=>{const pw=$('#new-pw').value;if(pw.length<6)return toast(tr('6 caractères minimum'));e.disabled=true;const r=await SB.auth.updateUser({password:pw});e.disabled=false;toast(tr(r.error?'Pas changé : vérifiez internet':'Mot de passe changé'))},
+  logout:e=>{if(!outArm){outArm=true;e.textContent=tr('Touchez encore pour sortir');return}outArm=false;doLogout()},
+  'pl-go':async e=>{const tel=val('pl-tel'),code=val('pl-code');if(tel.replace(/\D/g,'').length<9||code.length<4)return toast(tr('Écrivez votre numéro et votre code'));
+    e.disabled=true;e.textContent=tr('Connexion…');const ok=await portalLoad({tel,code});if(!ok){e.disabled=false;e.textContent=tr('Voir mes photos');return}view='c-accueil';render();toast(tr('Bienvenue'))},
+  'pl-out':()=>{PCRED=null;try{localStorage.removeItem(PKEY)}catch(e){}S.clients=[];S.seances=[];S.demandes=[];FILES=FILES.filter(f=>f.public);viewAs=null;view='c-studio';render()},
+});
+function selLink(){const el=$('#lnk');if(!el)return;const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);toast(tr('Lien sélectionné : copiez-le'))}
+
+if(ONLINE){render();onlineBoot()}else{load();cleanupExpired();render()}
+})();
+</script>
+
+</body>
+</html>
