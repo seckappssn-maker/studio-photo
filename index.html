@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="fr">
 <head><script>/* terangaapps.com : passe en https dès que le certificat est prêt */(function(){try{var l=location;if(l.protocol==="http:"&&/(^|\.)terangaapps\.com$/.test(l.hostname)){var u="https://"+l.host+l.pathname+l.search+l.hash;fetch("https://"+l.host+"/CNAME",{mode:"no-cors",cache:"no-store"}).then(function(){l.replace(u)}).catch(function(){})}}catch(e){}})();</script>
-<meta charset="utf-8">
+<meta charset="utf-8"><script>/* Essai gratuit : 1 mois pour toute inscription jusqu'au 31/01/2027 (offre de lancement), puis 14 jours. Même règle sur le serveur (Supabase seck_essai_fin). */window.ESSAI_LANCEMENT=Date.now()<Date.UTC(2027,1,1);window.ESSAI_TXT=ESSAI_LANCEMENT?'1 mois gratuit':'14 jours gratuits';window.ESSAI_TXT_LONG=ESSAI_LANCEMENT?"1 mois d'essai gratuit":"14 jours d'essai gratuit";window.ESSAI_IT=ESSAI_LANCEMENT?'1 mese gratis':'14 giorni gratis';window.ESSAI_JOURS=ESSAI_LANCEMENT?30:14;</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Studio Photo</title>
 <meta name="description" content="Séances, clients, livraison des photos et réservations en ligne pour les photographes. Chaque client récupère ses photos avec son code.">
@@ -778,11 +778,11 @@ const WO={
 "Abonnement expiré":"Abonnement bi jeex na","Essai gratuit":"Jéem (amul pey)","Abonné":"Abonné","par mois":"ci weer","J’ai payé : vérifier mon abonnement":"Fey naa : seet sama abonnement","Abonnement à jour":"Sa abonnement baax na","Pas encore de paiement reçu":"Jotaguñu pey bi","Vérification…":"Mangi seet…",
 "Abonnement terminé : vous pouvez regarder, pas modifier":"Abonnement bi jeex na : mën ngaa xool, waaye doo mën a soppi",
 "Se connecter":"Dugg","Créer un compte":"Sos kont","Créer mon salon":"Sos sama salon","Numéro de téléphone":"Nimero telefon","Mot de passe":"Baatu jàll","Répéter le mot de passe":"Bindaat baatu jàll bi","6 caractères minimum":"6 araf lu néew",
-"Notez bien votre mot de passe : il faudra le même sur un nouveau téléphone.":"Bindal bu baax sa baatu jàll : dinga ko soxla ci telefon bu bees.","7 jours gratuits.":"7 fan yu amul pey.",
+"Notez bien votre mot de passe : il faudra le même sur un nouveau téléphone.":"Bindal bu baax sa baatu jàll : dinga ko soxla ci telefon bu bees.","7 jours gratuits.":"7 fan yu amul pey.","1 mois gratuit.":"Benn weer bu amul pey.","14 jours gratuits.":"14 fan yu amul pey.",
 "Numéro ou mot de passe faux":"Nimero bi walla baatu jàll bi baaxul","Ce numéro a déjà un compte : appuyez sur « Se connecter »":"Nimero bii am na kont ba noppi : bësal « Dugg »","Les deux mots de passe ne sont pas pareils":"Ñaari baatu jàll yi yemuñu",
 "Le mot de passe doit avoir au moins 6 caractères":"Baatu jàll bi war na am 6 araf lu néew","Numéro de téléphone invalide":"Nimero bi baaxul","Pas de connexion internet : réessayez":"Amul internet : jéemaatal","Connexion…":"Mangi dugg…","Chargement…":"Mangi yebbi…","Envoi…":"Mangi yónnee…","Réessayer":"Jéemaatal",
 "Sauvegardé en ligne":"Denc nañu ko ci internet","Envoi en cours…":"Mangi yónnee…","Pas encore envoyé : vérifiez internet":"Yónneegul : seetal internet","Changer le mot de passe":"Soppi baatu jàll","Nouveau mot de passe":"Baatu jàll bu bees","Mot de passe changé":"Soppi nañu baatu jàll bi","Touchez encore pour sortir":"Bësaatal ngir génn",
-"Écrivez le nom de votre salon":"Bindal turu sa studio","Bienvenue ! 7 jours gratuits":"Dalal ak jàmm ! 7 fan yu amul pey","Ce salon est introuvable. Vérifiez le lien.":"Gisuñu studio bii. Seetal lien bi.",
+"Écrivez le nom de votre salon":"Bindal turu sa studio","Bienvenue ! 7 jours gratuits":"Dalal ak jàmm ! 7 fan yu amul pey","Bienvenue ! 1 mois gratuit":"Dalal ak jàmm ! Benn weer bu amul pey","Bienvenue ! 14 jours gratuits":"Dalal ak jàmm ! 14 fan yu amul pey","Ce salon est introuvable. Vérifiez le lien.":"Gisuñu studio bii. Seetal lien bi.",
 "Ce sont des exemples pour découvrir l'app.":"Misaal yu ngir xam app bi.","Commencer à vide":"Tàmbali ci dara","Mettez l’app sur l’écran d’accueil":"Def app bi ci écran d'accueil bi","Gardez le salon sur votre téléphone":"Denc studio bi ci sa telefon","C’est fait":"Def naa ko"
 };const WO_RX=[
 [/^Bonjour,? (.+)$/,"Nanga def $1"],[/^Bonsoir, (.+)$/,"Nanga def $1"],[/^Connecté : (.+)$/,"Dugg nga : $1"],[/^Reçu le (.+)$/,"Jot nañu ko ci $1"],[/^Nouveau code : (.+)$/,"Code bu bees : $1"],[/^Jusqu’au (.+)$/,"Ba $1"],[/^Merci (.+) !$/,"Jërëjëf $1 !"],
@@ -902,7 +902,7 @@ function onlineScreen(){
 
 /* ---------- connexion du photographe ---------- */
 function vLogin(){const su=AUTHM==='signup';
-  return `<div class="hello" style="padding-top:6px"><h1>${su?'Créer mon studio':'Se connecter'}</h1><p class="muted" style="margin:0">Vos séances, vos clients, leurs photos et votre caisse, sauvegardés en ligne.${su?' <b>7 jours gratuits.</b>':''}</p></div>
+  return `<div class="hello" style="padding-top:6px"><h1>${su?'Créer mon studio':'Se connecter'}</h1><p class="muted" style="margin:0">Vos séances, vos clients, leurs photos et votre caisse, sauvegardés en ligne.${su?' <b>'+ESSAI_TXT+'.</b>':''}</p></div>
   <div class="panel"><div class="chips"><button class="chip ${su?'':'on'}" data-act="authm" data-v="login">Se connecter</button><button class="chip ${su?'on':''}" data-act="authm" data-v="signup">Créer un compte</button></div>
   ${su?`<div class="f"><label for="au-nom">Nom du studio</label><input id="au-nom" placeholder="ex. Sanzo Picture"></div><div class="f"><label for="au-ville">Ville</label><input id="au-ville" placeholder="ex. Dakar"></div>`:''}
   <div class="f"><label for="au-tel">Numéro de téléphone</label><input id="au-tel" inputmode="tel" autocomplete="username" placeholder="77 000 00 00"></div>
@@ -919,7 +919,7 @@ async function doAuth(btn){const su=AUTHM==='signup',ph=phoneDigits(val('au-tel'
     if(r.error)throw r.error;if(!r.data.session){btn.disabled=false;btn.textContent=tr(su?'Créer mon studio':'Se connecter');return say('Compte créé mais pas encore actif. Contactez Seck Apps.')}
     USER=r.data.session.user;S=loadLocal();if(S&&S.uid!==USER.id)S=null;
     if(su){S=newState(nom,ville,ph.slice(3).replace(/(\d\d)(\d{3})(\d\d)(\d\d)/,'$1 $2 $3 $4'));S.uid=USER.id;saveOnline()}
-    await afterLogin();if(su){toast(tr('Bienvenue ! 7 jours gratuits'))}}
+    await afterLogin();if(su){toast(tr('Bienvenue ! '+ESSAI_TXT))}}
   catch(e){const m=String(e&&e.message||'');btn.disabled=false;btn.textContent=tr(su?'Créer mon studio':'Se connecter');
     say(/already|registered|exists/i.test(m)?'Ce numéro a déjà un compte : appuyez sur « Se connecter »':/invalid login|credentials/i.test(m)?'Numéro ou mot de passe faux':errTxt(e))}}
 async function afterLogin(){try{await cloudCheck()}catch(e){setSync('err')}
